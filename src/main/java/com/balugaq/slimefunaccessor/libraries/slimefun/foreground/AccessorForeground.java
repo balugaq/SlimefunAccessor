@@ -33,7 +33,7 @@ import javax.annotation.Nonnull;
  *
  * @author baluagq
  */
-public class SlimefunForeground extends Foreground {
+public class AccessorForeground extends Foreground {
     public static final ItemStack AUTO_RELATED_ICON = new CustomItemStack(
             Material.COMPASS,
             "&6Auto-related",
@@ -69,13 +69,13 @@ public class SlimefunForeground extends Foreground {
             .addItem("P", PREV_ICON)
             .addItem("N", NEXT_ICON);
 
-    public SlimefunForeground() {
+    public AccessorForeground() {
         super();
         connection.setContentPerPage(6 * 8);
     }
 
-    public static void applyBlockMenuPreset(@Nonnull BlockMenuPreset menu) {
-        MATRIX.build(menu);
+    public static void applyBlockMenuPreset(@Nonnull BlockMenuPreset preset) {
+        MATRIX.build(preset);
     }
 
     public static void applyBlockMenu(@Nonnull BlockMenu menu) {

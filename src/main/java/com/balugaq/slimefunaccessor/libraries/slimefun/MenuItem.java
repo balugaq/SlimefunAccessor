@@ -1,6 +1,6 @@
 package com.balugaq.slimefunaccessor.libraries.slimefun;
 
-import com.balugaq.slimefunaccessor.libraries.slimefun.foreground.SlimefunForeground;
+import com.balugaq.slimefunaccessor.libraries.slimefun.foreground.AccessorForeground;
 import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
 import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
@@ -19,21 +19,24 @@ import javax.annotation.Nullable;
 public abstract class MenuItem extends AccessorItem {
     public MenuItem(ItemGroup itemGroup, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe) {
         super(itemGroup, item, recipeType, recipe);
+        setupMenuPreset();
     }
 
     public MenuItem(ItemGroup itemGroup, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe, @Nullable ItemStack recipeOutput) {
         super(itemGroup, item, recipeType, recipe, recipeOutput);
+        setupMenuPreset();
     }
 
     protected MenuItem(ItemGroup itemGroup, ItemStack item, String id, RecipeType recipeType, ItemStack[] recipe) {
         super(itemGroup, item, id, recipeType, recipe);
+        setupMenuPreset();
     }
 
     public void setupMenuPreset() {
         new BlockMenuPreset(getId(), getItemName()) {
             @Override
             public void init() {
-                SlimefunForeground.applyBlockMenuPreset(this);
+                MenuItem.this.init(this);
             }
 
             @Override
@@ -53,6 +56,7 @@ public abstract class MenuItem extends AccessorItem {
         };
     }
 
+    public abstract void init(@Nonnull BlockMenuPreset preset);
     public abstract void newInstance(@Nonnull BlockMenu blockMenu, @Nonnull Block block);
 
     public boolean canOpenDefaultImpl(@Nonnull Block block, @Nonnull Player player) {
@@ -64,4 +68,8 @@ public abstract class MenuItem extends AccessorItem {
     }
 
     public abstract int[] getSlotsAccessedByItemTransport(ItemTransportFlow itemTransportFlow);
+
+    public BlockMenuPreset getMenuPreset() {
+        return Slimefun.getRegistry().getMenuPresets().get(getId());
+    }
 }
