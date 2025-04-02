@@ -1,0 +1,11 @@
+name: SlimefunAccessor
+author: balugaq
+description: A Slimefun plugin
+main: com.balugaq.slimefunaccessor.implementation.main.SlimefunAccessor
+website: https://github.com/balugaq/SlimefunAccessor
+version: ${project.version}
+api-version: 1.20
+depend:
+  - Slimefun
+softdepend:
+  - GuizhanLibPlugin
