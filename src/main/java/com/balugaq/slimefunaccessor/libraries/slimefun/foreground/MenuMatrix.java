@@ -1,4 +1,4 @@
-package com.balugaq.slimefunaccessor.libraries.foreground;
+package com.balugaq.slimefunaccessor.libraries.slimefun.foreground;
 
 import lombok.Getter;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ChestMenu;

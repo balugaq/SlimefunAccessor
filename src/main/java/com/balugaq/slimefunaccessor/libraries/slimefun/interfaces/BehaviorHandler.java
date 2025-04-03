@@ -1,5 +1,6 @@
-package com.balugaq.slimefunaccessor.libraries.interfaces;
+package com.balugaq.slimefunaccessor.libraries.slimefun.interfaces;
 
+import com.balugaq.slimefunaccessor.libraries.interfaces.FFunction;
 import com.balugaq.slimefunaccessor.libraries.utils.Pager;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ClickAction;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
