@@ -1,40 +1,49 @@
 package com.balugaq.slimefunaccessor.libraries.foreground;
 
 import com.balugaq.slimefunaccessor.libraries.utils.Pager;
-import lombok.Getter;
 import org.bukkit.Location;
 
 import javax.annotation.Nonnull;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
-@Getter
 public class Foreground {
-    public final Pager<Location> connection;
+    public static final Map<Location, Pager<Location>> connection = new ConcurrentHashMap<>();
 
     public Foreground() {
-        this.connection = new Pager<>();
     }
 
-    public void connect(@Nonnull Location location) {
-        this.connection.add(location);
+    public static Pager<Location> getConnection(@Nonnull Location identifier) {
+        return connection.getOrDefault(identifier, newPager());
     }
 
-    public void disconnect(@Nonnull Location location) {
-        this.connection.remove(location);
+    public void connect(@Nonnull Location identifier, @Nonnull Location location) {
+        connection.compute(identifier, (k, v) -> v == null? newPager() : v).add(identifier, location);
     }
 
-    public boolean isConnected(@Nonnull Location location) {
-        return this.connection.contains(location);
+    public void disconnect(@Nonnull Location identifier, @Nonnull Location location) {
+        connection.getOrDefault(identifier, newPager()).remove(location);
     }
 
-    public boolean isEmpty() {
-        return this.connection.isEmpty();
+    public boolean isConnected(@Nonnull Location identifier, @Nonnull Location location) {
+        return connection.getOrDefault(identifier, newPager()).contains(location);
     }
 
-    public int totalConnected() {
-        return this.connection.size();
+    public boolean isEmpty(@Nonnull Location identifier) {
+        return connection.getOrDefault(identifier, newPager()).isEmpty();
     }
 
-    public void destroy() {
-        this.connection.clear();
+    public int totalConnected(@Nonnull Location identifier) {
+        return connection.getOrDefault(identifier, newPager()).size();
+    }
+
+    public void destroy(@Nonnull Location identifier) {
+        connection.getOrDefault(identifier, newPager()).clear();
+    }
+
+    public static Pager<Location> newPager() {
+        Pager<Location> pager = new Pager<>();
+        pager.setContentPerPage(6 * 8);
+        return pager;
     }
 }

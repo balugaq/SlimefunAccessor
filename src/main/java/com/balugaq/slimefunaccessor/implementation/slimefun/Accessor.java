@@ -14,6 +14,7 @@ import org.bukkit.inventory.ItemStack;
 import javax.annotation.Nonnull;
 
 public class Accessor extends MenuItem {
+    public static final String BS_FILTER_KEY = "filter";
     public Accessor(ItemGroup itemGroup, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe) {
         super(itemGroup, item, recipeType, recipe);
         AccessorForeground.applyBlockMenuPreset(getMenuPreset());

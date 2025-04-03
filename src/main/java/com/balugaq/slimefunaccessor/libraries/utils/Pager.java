@@ -2,16 +2,19 @@ package com.balugaq.slimefunaccessor.libraries.utils;
 
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
+import io.github.thebusybiscuit.slimefun4.libraries.dough.collections.Pair;
 import lombok.Getter;
+import lombok.Setter;
 
 import javax.annotation.Nonnull;
+import javax.xml.stream.Location;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 @Getter
 public class Pager<T> {
-    public List<T> content = new ArrayList<>();
+    public List<Pair<T, Descriptor<T>>> content = new ArrayList<>();
     public int contentPerPage = 9;
     public int currentPage = 1;
 
@@ -30,7 +33,7 @@ public class Pager<T> {
     }
 
     @Nonnull
-    public Pager<T> setContent(@Nonnull List<T> content) {
+    public Pager<T> setContent(@Nonnull List<Pair<T, Descriptor<T>>> content) {
         this.content = new ArrayList<>(content);
         int totalPage = getTotalPage();
         if (totalPage == 0) {
@@ -72,12 +75,18 @@ public class Pager<T> {
 
     @Nonnull
     public Pager<T> add(@Nonnull T element) {
+        content.add(new Pair<>(element, new Descriptor<>(element)));
+        return this;
+    }
+
+    @Nonnull
+    public Pager<T> add(@Nonnull Pair<T, Descriptor<T>> element) {
         content.add(element);
         return this;
     }
 
     @Nonnull
-    public Pager<T> addAll(@Nonnull Collection<T> elements) {
+    public Pager<T> addAll(@Nonnull Collection<Pair<T, Descriptor<T>>> elements) {
         content.addAll(elements);
         return this;
     }
@@ -111,7 +120,7 @@ public class Pager<T> {
     }
 
     @Nonnull
-    public List<T> next() {
+    public List<Pair<T, Descriptor<T>>> next() {
         if (hasNext()) currentPage++;
         int start = (currentPage - 1) * contentPerPage;
         int end = Math.min(currentPage * contentPerPage, content.size());
@@ -119,7 +128,7 @@ public class Pager<T> {
     }
 
     @Nonnull
-    public List<T> previous() {
+    public List<Pair<T, Descriptor<T>>> previous() {
         if (hasPrevious()) currentPage--;
         int start = (currentPage - 1) * contentPerPage;
         int end = Math.min(currentPage * contentPerPage, content.size());
@@ -127,12 +136,12 @@ public class Pager<T> {
     }
 
     @Nonnull
-    public Pager<T> turnToPageWhere(@Nonnull Function<T, Boolean> condition) {
+    public Pager<T> turnToPageWhere(@Nonnull Function<Pair<T, Descriptor<T>>, Boolean> condition) {
         int batchSize = 1000;  // 分批处理
         for (int i = 0; i < content.size(); i += batchSize) {
             int end = Math.min(i + batchSize, content.size());
-            List<T> batch = content.subList(i, end);
-            for (T item : batch) {
+            List<Pair<T, Descriptor<T>>> batch = content.subList(i, end);
+            for (Pair<T, Descriptor<T>> item : batch) {
                 if (condition.apply(item)) {
                     setCurrentPage(getPageFromIndex(i));
                     return this;
@@ -141,5 +150,21 @@ public class Pager<T> {
         }
         setCurrentPage(1);
         return this;
+    }
+
+    @Getter
+    public static class Descriptor<T> {
+        private final T item;
+        @Setter
+        private String tag = null;
+
+        public Descriptor(@Nonnull T item) {
+            this.item = item;
+        }
+
+        public Descriptor(@Nonnull T item, @Nonnull String tag) {
+            this.item = item;
+            this.tag = tag;
+        }
     }
 }

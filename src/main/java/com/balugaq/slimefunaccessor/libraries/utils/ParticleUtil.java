@@ -1,5 +1,6 @@
 package com.balugaq.slimefunaccessor.libraries.utils;
 
+import com.balugaq.slimefunaccessor.implementation.main.SlimefunAccessor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.World;
@@ -137,5 +138,17 @@ public class ParticleUtil {
             blocks[i] = blockList.get(i);
         }
         ParticleUtil.drawCubeByBlock(plugin, particle, interval, blocks);
+    }
+
+    public static void drawLineFrom(Location location1, Location location2) {
+        ParticleUtil.drawLineByTotalAmount(Particle.END_ROD, 10, location1, location2);
+    }
+
+    public static void highlightBlock(Location location) {
+        highlightBlock(location.getBlock());
+    }
+
+    public static void highlightBlock(Block block) {
+        ParticleUtil.drawCubeByBlock(SlimefunAccessor.instance(), Particle.END_ROD, 1, block);
     }
 }
