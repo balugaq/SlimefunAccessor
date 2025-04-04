@@ -2,6 +2,7 @@ package com.balugaq.slimefunaccessor.implementation.slimefun;
 
 import com.balugaq.slimefunaccessor.libraries.slimefun.MenuItem;
 import com.balugaq.slimefunaccessor.libraries.slimefun.foreground.AccessorForeground;
+import com.balugaq.slimefunaccessor.libraries.utils.Logger;
 import com.balugaq.slimefunaccessor.libraries.utils.Pager;
 import com.xzavier0722.mc.plugin.slimefun4.storage.controller.SlimefunBlockData;
 import com.xzavier0722.mc.plugin.slimefun4.storage.util.StorageCacheUtils;
@@ -25,6 +26,7 @@ import org.bukkit.inventory.ItemStack;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.HashMap;
 import java.util.List;
 
 public class Accessor extends MenuItem {
@@ -69,8 +71,9 @@ public class Accessor extends MenuItem {
     }
 
     public static void load(Location root, Pager<Location> connection, int radius) {
+        Logger.log("Loading connection for " + root);
         World world = root.getWorld();
-        Slimefun.getTickerTask().getLocations().values().forEach(locations -> {
+        new HashMap<>(Slimefun.getTickerTask().getLocations()).values().forEach(locations -> {
             locations.forEach(location -> {
                 if (location.getWorld() == world && location.distance(root) <= radius) {
                     connection.add(location);

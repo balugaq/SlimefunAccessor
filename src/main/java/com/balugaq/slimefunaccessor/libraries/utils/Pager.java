@@ -2,6 +2,7 @@ package com.balugaq.slimefunaccessor.libraries.utils;
 
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -29,41 +30,31 @@ public class Pager<T> {
     private int contentPerPage = 9;
     private int currentPage = 1;
 
+    @CanIgnoreReturnValue
     @Nonnull
     public Pager<T> setContentPerPage(int contentPerPage) {
         Preconditions.checkArgument(contentPerPage > 0, "contentPerPage must be greater than 0");
         this.contentPerPage = contentPerPage;
 
         int totalPage = getTotalPages();
-        if (totalPage == 0) {
-            this.currentPage = 0;
-        } else {
-            this.currentPage = Math.min(currentPage, totalPage);
-        }
+        this.currentPage = Math.min(currentPage, totalPage);
         return this;
     }
 
+    @CanIgnoreReturnValue
     @Nonnull
     private Pager<T> setContent(@Nonnull List<Container<T>> content) {
         this.content = new ArrayList<>(content);
         int totalPage = getTotalPages();
-        if (totalPage == 0) {
-            this.currentPage = 0;
-        } else {
-            this.currentPage = Math.min(currentPage, totalPage);
-        }
+        this.currentPage = Math.min(currentPage, totalPage);
         return this;
     }
 
+    @CanIgnoreReturnValue
     @Nonnull
     private Pager<T> setCurrentPage(int page) {
         int totalPage = getTotalPages();
-        if (totalPage == 0) {
-            if (page != 0) {
-                Logger.warn("Invalid page number: " + page + " (total page: 0)");
-                this.currentPage = Math.max(1, Math.min(page, getTotalPages()));
-            }
-        } else if (!isInbounds(page)) {
+        if (isOutbounds(page)) {
             Logger.warn("Invalid page number: " + page + " (total page: " + totalPage + ")");
             this.currentPage = Math.max(1, Math.min(page, getTotalPages()));
         } else {
@@ -82,40 +73,46 @@ public class Pager<T> {
 
     public int getTotalPages() {
         if (contentPerPage <= 0 || content.isEmpty()) {
-            return 0;
+            return 1;
         }
-        return (int) Math.ceil((double) content.size() / contentPerPage);
+        return Math.max(1, (int) Math.ceil((double) content.size() / contentPerPage));
     }
 
+    @CanIgnoreReturnValue
     @Nonnull
     public Pager<T> add(@Nonnull T element) {
         content.add(new Container<>(element));
         return this;
     }
 
+    @CanIgnoreReturnValue
     @Nonnull
     public Pager<T> add(@Nonnull Container<T> element) {
         content.add(element);
         return this;
     }
 
+    @CanIgnoreReturnValue
     @Nonnull
     public Pager<T> addAll(@Nonnull Collection<Container<T>> elements) {
         content.addAll(elements);
         return this;
     }
 
+    @CanIgnoreReturnValue
     @Nonnull
     public Pager<T> remove(@Nonnull T element) {
         return remove(new Container<>(element));
     }
 
+    @CanIgnoreReturnValue
     @Nonnull
     public Pager<T> remove(@Nonnull Container<T> element) {
         content.remove(element);
         return this;
     }
 
+    @CanIgnoreReturnValue
     @Nonnull
     public Pager<T> clear() {
         content.clear();
@@ -142,12 +139,14 @@ public class Pager<T> {
         return (index / contentPerPage) + 1;
     }
 
+    @CanIgnoreReturnValue
     @Nonnull
     public List<Container<T>> next() {
         if (hasNext()) currentPage++;
         return getPage(currentPage);
     }
 
+    @CanIgnoreReturnValue
     @Nonnull
     public List<Container<T>> previous() {
         if (hasPrevious()) currentPage--;
@@ -192,7 +191,7 @@ public class Pager<T> {
     }
 
     public List<Container<T>> getPage(int page) {
-        if (!isInbounds(page)) {
+        if (isOutbounds(page)) {
             return Collections.emptyList();
         }
         int start = (page - 1) * contentPerPage;
@@ -200,8 +199,8 @@ public class Pager<T> {
         return new ArrayList<>(content.subList(start, end));
     }
 
-    public boolean isInbounds(int page) {
-        return page >= 1 && page <= getTotalPages();
+    public boolean isOutbounds(int page) {
+        return page < 1 || page > getTotalPages();
     }
 
     @EqualsAndHashCode

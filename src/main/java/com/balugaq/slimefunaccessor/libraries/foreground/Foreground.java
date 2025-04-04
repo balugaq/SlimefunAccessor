@@ -17,7 +17,13 @@ public class Foreground {
     }
 
     public static Pager<Location> getConnection(@Nonnull Location identifier) {
-        return connections.getOrDefault(identifier, newPager());
+        Pager<Location> existing = connections.get(identifier);
+        if (existing == null) {
+            existing = newPager();
+            connections.put(identifier, existing);
+        }
+
+        return existing;
     }
 
     public static Pager<Location> newPager() {
@@ -31,22 +37,22 @@ public class Foreground {
     }
 
     public void disconnect(@Nonnull Location identifier, @Nonnull Location location) {
-        connections.getOrDefault(identifier, newPager()).remove(location);
+        connections.compute(identifier, (k, v) -> v == null ? newPager() : v).remove(location);
     }
 
     public boolean isConnected(@Nonnull Location identifier, @Nonnull Location location) {
-        return connections.getOrDefault(identifier, newPager()).contains(location);
+        return connections.compute(identifier, (k, v) -> v == null ? newPager() : v).contains(location);
     }
 
     public boolean isEmpty(@Nonnull Location identifier) {
-        return connections.getOrDefault(identifier, newPager()).isEmpty();
+        return connections.compute(identifier, (k, v) -> v == null ? newPager() : v).isEmpty();
     }
 
     public int totalConnected(@Nonnull Location identifier) {
-        return connections.getOrDefault(identifier, newPager()).size();
+        return connections.compute(identifier, (k, v) -> v == null ? newPager() : v).size();
     }
 
     public void destroy(@Nonnull Location identifier) {
-        connections.getOrDefault(identifier, newPager()).clear();
+        connections.compute(identifier, (k, v) -> v == null ? newPager() : v).clear();
     }
 }

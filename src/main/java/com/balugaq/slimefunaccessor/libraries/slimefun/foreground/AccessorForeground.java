@@ -5,6 +5,7 @@ import com.balugaq.slimefunaccessor.libraries.foreground.Foreground;
 import com.balugaq.slimefunaccessor.libraries.slimefun.interfaces.BehaviorHandler;
 import com.balugaq.slimefunaccessor.libraries.slimefun.utils.SlimefunItemUtil;
 import com.balugaq.slimefunaccessor.libraries.utils.ChatUtils;
+import com.balugaq.slimefunaccessor.libraries.utils.Logger;
 import com.balugaq.slimefunaccessor.libraries.utils.Pager;
 import com.balugaq.slimefunaccessor.libraries.utils.ParticleUtil;
 import com.balugaq.slimefunaccessor.libraries.utils.PdcUtil;
@@ -25,6 +26,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.BoundingBox;
 
 import javax.annotation.Nonnull;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -87,7 +89,7 @@ public class AccessorForeground extends Foreground {
             .addItem("P", PREV_ICON)
             .addItem("N", NEXT_ICON);
 
-    public static List<Integer> displaySlots;
+    public static List<Integer> displaySlots = new ArrayList<>();
 
     static {
         final int[] rawDisplaySlots = MATRIX.getChars("D");
@@ -141,7 +143,14 @@ public class AccessorForeground extends Foreground {
             final List<Pager.Container<Location>> pages;
             final String filter = StorageCacheUtils.getData(location, Accessor.BS_FILTER_KEY);
             if (filter == null) {
-                pages = pager.getPageLimited(displaySlots.size());
+                pages = pager.getPageLimited(pager.getCurrentPage(), displaySlots.size(), container -> {
+                    Location loc = container.getData();
+                    final SlimefunItem slimefunItem = StorageCacheUtils.getSfItem(loc);
+                    if (slimefunItem != null) {
+                        slimefunItems.put(loc, slimefunItem);
+                    }
+                    return true;
+                });
             } else {
                 pages = pager.getPageLimited(1, displaySlots.size(), container -> {
                     Location loc = container.getData();
@@ -175,8 +184,13 @@ public class AccessorForeground extends Foreground {
         };
 
         // Done
-        public static final BehaviorHandler SEARCH = (pager, menu, p, u1, u2, u3) -> {
+        public static final BehaviorHandler SEARCH = (pager, menu, p, u1, u2, action) -> {
             Location location = menu.getLocation();
+            if (action.isRightClicked()) {
+                StorageCacheUtils.removeData(location, Accessor.BS_FILTER_KEY);
+                return false;
+            }
+
             p.closeInventory();
             ChatUtils.awaitInput(p, "Enter keywords to search: ", input -> {
                 StorageCacheUtils.setData(location, Accessor.BS_FILTER_KEY, input);
@@ -186,7 +200,7 @@ public class AccessorForeground extends Foreground {
                     return;
                 }
                 actualMenu.open(p);
-                UPDATE_MENU.apply(pager, menu, p, u1, u2, u3);
+                UPDATE_MENU.apply(pager, menu, p, u1, u2, action);
             });
             return false;
         };

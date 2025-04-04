@@ -4,8 +4,8 @@ import lombok.Getter;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,7 +13,7 @@ import java.util.List;
 public class ListenerManager extends Manager {
     private final List<Listener> listeners = new ArrayList<>();
 
-    public ListenerManager(@NotNull JavaPlugin plugin) {
+    public ListenerManager(@Nonnull JavaPlugin plugin) {
         super(plugin);
     }
 
@@ -32,7 +32,7 @@ public class ListenerManager extends Manager {
         listeners.clear();
     }
 
-    public void addListener(@NotNull Listener listener) {
+    public void addListener(@Nonnull Listener listener) {
         listeners.add(listener);
     }
 }

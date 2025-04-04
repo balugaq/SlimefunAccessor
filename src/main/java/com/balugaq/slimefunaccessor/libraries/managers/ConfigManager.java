@@ -2,7 +2,6 @@ package com.balugaq.slimefunaccessor.libraries.managers;
 
 import lombok.Getter;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -28,7 +27,7 @@ public class ConfigManager extends Manager {
     }
 
     @Nullable
-    public String getString(@NotNull String path) {
+    public String getString(@Nonnull String path) {
         if (cachedValues.containsKey(path)) {
             return String.valueOf(cachedValues.get(path));
         }
@@ -38,7 +37,7 @@ public class ConfigManager extends Manager {
         return value;
     }
 
-    public boolean getBoolean(@NotNull String path) {
+    public boolean getBoolean(@Nonnull String path) {
         if (cachedValues.containsKey(path)) {
             return Boolean.parseBoolean(String.valueOf(cachedValues.get(path)));
         }
@@ -48,7 +47,7 @@ public class ConfigManager extends Manager {
         return value;
     }
 
-    public int getInt(@NotNull String path) {
+    public int getInt(@Nonnull String path) {
         if (cachedValues.containsKey(path)) {
             return Integer.parseInt(String.valueOf(cachedValues.get(path)));
         }
@@ -58,7 +57,7 @@ public class ConfigManager extends Manager {
         return value;
     }
 
-    public double getDouble(@NotNull String path) {
+    public double getDouble(@Nonnull String path) {
         if (cachedValues.containsKey(path)) {
             return Double.parseDouble(String.valueOf(cachedValues.get(path)));
         }
@@ -68,7 +67,7 @@ public class ConfigManager extends Manager {
         return value;
     }
 
-    public long getLong(@NotNull String path) {
+    public long getLong(@Nonnull String path) {
         if (cachedValues.containsKey(path)) {
             return Long.parseLong(String.valueOf(cachedValues.get(path)));
         }
@@ -78,7 +77,7 @@ public class ConfigManager extends Manager {
         return value;
     }
 
-    public void set(@NotNull String path, @Nullable Object value) {
+    public void set(@Nonnull String path, @Nullable Object value) {
         getPlugin().getConfig().set(path, value);
         cachedValues.put(path, value);
         save();
