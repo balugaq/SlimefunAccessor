@@ -310,7 +310,7 @@ public class AccessorForeground extends Foreground {
         // Done
         public static final BehaviorHandler ESP_BLOCK = (u1, u2, p, u3, item, u4) -> {
             PdcUtil.findLocationPdc(item).ifPresent(location -> {
-                ParticleUtil.drawLineFrom(p.getLocation(), location);
+                ParticleUtil.drawLineFrom(p.getLocation(), location.clone().add(0.5, 0.5, 0.5));
                 ParticleUtil.highlightBlock(location);
             });
 

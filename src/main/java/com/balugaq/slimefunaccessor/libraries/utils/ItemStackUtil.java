@@ -11,6 +11,7 @@ import org.bukkit.inventory.meta.SkullMeta;
 
 import javax.annotation.Nullable;
 import java.net.URL;
+import java.util.List;
 
 public class ItemStackUtil {
     public static ItemStack safeCopy(ItemStack legacy) {
@@ -70,17 +71,19 @@ public class ItemStackUtil {
             return null;
         }
 
-        if (name == null) {
-            return original;
-        }
-
         ItemStack itemStack = original.clone();
         ItemMeta meta = itemStack.getItemMeta();
         if (meta == null) {
             return itemStack;
         }
 
-        meta.setDisplayName(name);
+        if (name != null) {
+            meta.setDisplayName(name);
+        }
+        if (lore != null && lore.length > 0) {
+            meta.setLore(List.of(lore));
+        }
+
         itemStack.setItemMeta(meta);
         return itemStack;
     }
