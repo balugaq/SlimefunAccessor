@@ -1,11 +1,12 @@
 package com.balugaq.slimefunaccessor.libraries.slimefun.foreground;
 
+import com.balugaq.slimefunaccessor.implementation.listeners.InventoryListener;
 import com.balugaq.slimefunaccessor.implementation.slimefun.Accessor;
 import com.balugaq.slimefunaccessor.libraries.foreground.Foreground;
 import com.balugaq.slimefunaccessor.libraries.slimefun.interfaces.BehaviorHandler;
 import com.balugaq.slimefunaccessor.libraries.slimefun.utils.SlimefunItemUtil;
 import com.balugaq.slimefunaccessor.libraries.utils.ChatUtils;
-import com.balugaq.slimefunaccessor.libraries.utils.Logger;
+import com.balugaq.slimefunaccessor.libraries.utils.ItemStackUtil;
 import com.balugaq.slimefunaccessor.libraries.utils.Pager;
 import com.balugaq.slimefunaccessor.libraries.utils.ParticleUtil;
 import com.balugaq.slimefunaccessor.libraries.utils.PdcUtil;
@@ -28,9 +29,7 @@ import org.bukkit.util.BoundingBox;
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Menu should be applied like this:
@@ -54,35 +53,42 @@ import java.util.Map;
 public class AccessorForeground extends Foreground {
     public static final ItemStack AUTO_RELATED_ICON = new CustomItemStack(
             Material.COMPASS,
-            "&6Auto-related",
-            "&7Click to display machines related to the nearest item frame.",
-            "&6Right-click to auto-related tags.",
-            "&6Shift+Right-click to force override old tags and set new tags."
+            "&6自动标记",
+            "&7点击以自动标记未标记的机器（寻找最近的展示框）",
+            "&6Shift 点击以强制标记所有机器"
     );
 
     public static final ItemStack SEARCH_ICON = new CustomItemStack(
             Material.NAME_TAG,
-            "&6Search",
-            "&7Click to input keywords to search."
+            "&6搜索",
+            "&7点击输入搜索关键词."
     );
     public static final ItemStack PREV_ICON = new CustomItemStack(
             Material.ARROW,
-            "&6Previous",
-            "&7Click to go to previous page."
+            "&6上一页",
+            "&7点击翻到上一页."
     );
     public static final ItemStack NEXT_ICON = new CustomItemStack(
             Material.SPECTRAL_ARROW,
-            "&6Next",
-            "&7Click to go to next page."
+            "&6下一页",
+            "&7点击翻到下一页."
     );
+
+    public static final ItemStack RANGE_ICON = new CustomItemStack(
+            Material.CLOCK,
+            "&6范围",
+            "&7点击设置远程范围.（1~200）"
+    );
+
     public static final MenuMatrix MATRIX = new MenuMatrix()
             .addLine("DDDDDDDDX")
-            .addLine("DDDDDDDDB")
+            .addLine("DDDDDDDDR")
             .addLine("DDDDDDDDB")
             .addLine("DDDDDDDDS")
             .addLine("DDDDDDDDP")
             .addLine("DDDDDDDDN")
             .addItem("X", AUTO_RELATED_ICON)
+            .addItem("R", RANGE_ICON)
             .addItem("D", ChestMenuUtils.getBackground())
             .addItem("B", ChestMenuUtils.getBackground())
             .addItem("S", SEARCH_ICON)
@@ -107,17 +113,37 @@ public class AccessorForeground extends Foreground {
     }
 
     public static void applyBlockMenu(@Nonnull BlockMenu menu) {
-        menu.addMenuClickHandler(MATRIX.getChar("X"), (p, s, i, a) -> Behavior.AUTO_RELATED.apply(getConnection(menu.getLocation()), menu, p, s, i, a));
-        menu.addMenuClickHandler(MATRIX.getChar("D"), (p, s, i, a) -> Behavior.DISPLAY.apply(getConnection(menu.getLocation()), menu, p, s, i, a));
-        menu.addMenuClickHandler(MATRIX.getChar("S"), (p, s, i, a) -> Behavior.SEARCH.apply(getConnection(menu.getLocation()), menu, p, s, i, a));
-        menu.addMenuClickHandler(MATRIX.getChar("P"), (p, s, i, a) -> Behavior.PREV.apply(getConnection(menu.getLocation()), menu, p, s, i, a));
-        menu.addMenuClickHandler(MATRIX.getChar("N"), (p, s, i, a) -> Behavior.NEXT.apply(getConnection(menu.getLocation()), menu, p, s, i, a));
+        for (int slot : MATRIX.getChars("X")) {
+            menu.addMenuClickHandler(slot, (p, s, i, a) -> Behavior.AUTO_RELATED.apply(getConnection(menu.getLocation()), menu, p, s, i, a));
+        }
+
+        for (int slot : MATRIX.getChars("R")) {
+            menu.addMenuClickHandler(slot, (p, s, i, a) -> Behavior.RANGE.apply(getConnection(menu.getLocation()), menu, p, s, i, a));
+        }
+
+        for (int slot : MATRIX.getChars("D")) {
+            menu.addMenuClickHandler(slot, (p, s, i, a) -> Behavior.DISPLAY.apply(getConnection(menu.getLocation()), menu, p, s, i, a));
+        }
+
+        for (int slot : MATRIX.getChars("S")) {
+            menu.addMenuClickHandler(slot, (p, s, i, a) -> Behavior.SEARCH.apply(getConnection(menu.getLocation()), menu, p, s, i, a));
+        }
+
+        for (int slot : MATRIX.getChars("P")) {
+            menu.addMenuClickHandler(slot, (p, s, i, a) -> Behavior.PREV.apply(getConnection(menu.getLocation()), menu, p, s, i, a));
+        }
+
+        for (int slot : MATRIX.getChars("N")) {
+            menu.addMenuClickHandler(slot, (p, s, i, a) -> Behavior.NEXT.apply(getConnection(menu.getLocation()), menu, p, s, i, a));
+        }
     }
 
     public static void addAccessible(Location location) {
         World world = location.getWorld();
         for (Location root : getConnections().keySet()) {
-            if (root.getWorld() == world && root.distance(location) < Accessor.RADIUS) {
+            String rangeStr = StorageCacheUtils.getData(root, Accessor.BS_RANGE_KEY);
+            int range = rangeStr == null ? Accessor.DEFAULT_RANGE : Integer.parseInt(rangeStr);
+            if (root.getWorld() == world && root.distance(location) < range) {
                 getConnections().get(root).add(location);
             }
         }
@@ -126,39 +152,32 @@ public class AccessorForeground extends Foreground {
     public static void removeAccessible(Location location) {
         World world = location.getWorld();
         for (Location root : getConnections().keySet()) {
-            if (root.getWorld() == world && root.distance(location) < Accessor.RADIUS) {
+            String rangeStr = StorageCacheUtils.getData(root, Accessor.BS_RANGE_KEY);
+            int range = rangeStr == null ? Accessor.DEFAULT_RANGE : Integer.parseInt(rangeStr);
+            if (root.getWorld() == world && root.distance(location) < range) {
                 getConnections().get(root).remove(location);
             }
         }
     }
 
     public static class Behavior {
+        // Done
         public static final BehaviorHandler UPDATE_MENU = (pager, menu, u1, u2, u3, u4) -> {
-            Location location = menu.getLocation();
+            final Location location = menu.getLocation();
             if (!menu.hasViewer()) {
                 return false;
             }
 
-            final Map<Location, SlimefunItem> slimefunItems = new HashMap<>();
             final List<Pager.Container<Location>> pages;
             final String filter = StorageCacheUtils.getData(location, Accessor.BS_FILTER_KEY);
             if (filter == null) {
-                pages = pager.getPageLimited(pager.getCurrentPage(), displaySlots.size(), container -> {
-                    Location loc = container.getData();
-                    final SlimefunItem slimefunItem = StorageCacheUtils.getSfItem(loc);
-                    if (slimefunItem != null) {
-                        slimefunItems.put(loc, slimefunItem);
-                    }
-                    return true;
-                });
+                pages = pager.getPageLimited(pager.getCurrentPage(), displaySlots.size());
             } else {
                 pages = pager.getPageLimited(1, displaySlots.size(), container -> {
-                    Location loc = container.getData();
-                    String tag = container.getTag();
+                    final String tag = container.getTag();
                     final String itemName;
-                    final SlimefunItem slimefunItem = StorageCacheUtils.getSfItem(loc);
+                    final SlimefunItem slimefunItem = container.getSlimefunItem();
                     if (slimefunItem != null) {
-                        slimefunItems.put(loc, slimefunItem);
                         itemName = ChatColor.stripColor(slimefunItem.getItemName());
                     } else {
                         itemName = null;
@@ -172,10 +191,11 @@ public class AccessorForeground extends Foreground {
                 if (i >= pages.size()) {
                     menu.replaceExistingItem(slot, ChestMenuUtils.getBackground());
                 } else {
-                    final Location loc = pages.get(i).getData();
-                    final SlimefunItem slimefunItem = slimefunItems.get(loc);
+                    final Pager.Container<Location> container = pages.get(i);
+                    final Location loc = container.getData();
+                    final SlimefunItem slimefunItem = container.getSlimefunItem();
                     if (slimefunItem != null) {
-                        menu.replaceExistingItem(slot, SlimefunItemUtil.safeCopy(slimefunItem.getItem(), loc, slimefunItem.getId()));
+                        menu.replaceExistingItem(slot, ItemStackUtil.rename(SlimefunItemUtil.safeCopy(slimefunItem.getItem(), loc, slimefunItem.getId()), container.getTag()));
                     }
                 }
             }
@@ -192,9 +212,9 @@ public class AccessorForeground extends Foreground {
             }
 
             p.closeInventory();
-            ChatUtils.awaitInput(p, "Enter keywords to search: ", input -> {
+            ChatUtils.awaitInput(p, "输入检索关键词：", input -> {
                 StorageCacheUtils.setData(location, Accessor.BS_FILTER_KEY, input);
-                p.sendMessage("Set search keywords to: " + input);
+                p.sendMessage("已设置关键词：" + input);
                 BlockMenu actualMenu = StorageCacheUtils.getMenu(location);
                 if (actualMenu == null) {
                     return;
@@ -256,9 +276,9 @@ public class AccessorForeground extends Foreground {
         };
 
         // Done
-        public static final BehaviorHandler DISPLAY = (u1, u2, p, u3, item, action) -> {
+        public static final BehaviorHandler DISPLAY = (u1, menu, p, u3, item, action) -> {
             if (action.isRightClicked()) {
-                ESP_BLOCK.apply(u1, u2, p, u3, item, action);
+                ESP_BLOCK.apply(u1, menu, p, u3, item, action);
                 return false;
             }
 
@@ -269,8 +289,41 @@ public class AccessorForeground extends Foreground {
                     return;
                 }
                 actualMenu.open(p);
+                InventoryListener.addRemoteAccessingPlayer(p, menu.getLocation());
             });
 
+            return false;
+        };
+
+        public static final BehaviorHandler RANGE = (pager, menu, p, u1, u2, action) -> {
+            Location location = menu.getLocation();
+            if (action.isRightClicked()) {
+                StorageCacheUtils.setData(location, Accessor.BS_RANGE_KEY, String.valueOf(Accessor.DEFAULT_RANGE));
+                return false;
+            }
+
+            p.closeInventory();
+            ChatUtils.awaitInput(p, "输入远程范围：（1~200）", input -> {
+                try {
+                    int range = Integer.parseInt(input);
+                    if (range < 1 || range > 200) {
+                        p.sendMessage("输入范围必须在1~200之间！");
+                        return;
+                    }
+                    StorageCacheUtils.setData(location, Accessor.BS_RANGE_KEY, String.valueOf(range));
+                } catch (NumberFormatException e) {
+                    p.sendMessage("输入范围必须是整数！");
+                    return;
+                }
+
+                p.sendMessage("已设置远程范围为： " + input);
+                BlockMenu actualMenu = StorageCacheUtils.getMenu(location);
+                if (actualMenu == null) {
+                    return;
+                }
+                actualMenu.open(p);
+                UPDATE_MENU.apply(pager, menu, p, u1, u2, action);
+            });
             return false;
         };
     }

@@ -33,26 +33,30 @@ public class Foreground {
     }
 
     public void connect(@Nonnull Location identifier, @Nonnull Location location) {
-        connections.compute(identifier, (k, v) -> v == null ? newPager() : v).add(location);
+        getOrCreateConnection(identifier).add(location);
     }
 
     public void disconnect(@Nonnull Location identifier, @Nonnull Location location) {
-        connections.compute(identifier, (k, v) -> v == null ? newPager() : v).remove(location);
+        getOrCreateConnection(identifier).remove(location);
     }
 
     public boolean isConnected(@Nonnull Location identifier, @Nonnull Location location) {
-        return connections.compute(identifier, (k, v) -> v == null ? newPager() : v).contains(location);
+        return getOrCreateConnection(identifier).contains(location);
     }
 
     public boolean isEmpty(@Nonnull Location identifier) {
-        return connections.compute(identifier, (k, v) -> v == null ? newPager() : v).isEmpty();
+        return getOrCreateConnection(identifier).isEmpty();
     }
 
     public int totalConnected(@Nonnull Location identifier) {
-        return connections.compute(identifier, (k, v) -> v == null ? newPager() : v).size();
+        return getOrCreateConnection(identifier).size();
     }
 
     public void destroy(@Nonnull Location identifier) {
-        connections.compute(identifier, (k, v) -> v == null ? newPager() : v).clear();
+        getOrCreateConnection(identifier).clear();
+    }
+
+    public Pager<Location> getOrCreateConnection(@Nonnull Location identifier) {
+        return connections.computeIfAbsent(identifier, k -> newPager());
     }
 }

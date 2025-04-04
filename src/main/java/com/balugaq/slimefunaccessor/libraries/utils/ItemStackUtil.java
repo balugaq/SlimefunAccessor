@@ -59,4 +59,16 @@ public class ItemStackUtil {
         }
         return null;
     }
+
+    public static ItemStack rename(ItemStack original, String name) {
+        if (name == null) {
+            return original;
+        }
+
+        ItemStack itemStack = original.clone();
+        ItemMeta meta = itemStack.getItemMeta();
+        meta.setDisplayName(name);
+        itemStack.setItemMeta(meta);
+        return itemStack;
+    }
 }

@@ -27,11 +27,15 @@ import org.bukkit.inventory.ItemStack;
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class Accessor extends MenuItem {
-    public static final int RADIUS = 100;
+    private static final Set<Location> loaded = new HashSet<>();
+    public static final int DEFAULT_RANGE = 100;
     public static final String BS_FILTER_KEY = "filter";
+    public static final String BS_RANGE_KEY = "range";
 
     public Accessor(ItemGroup itemGroup, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe) {
         super(itemGroup, item, recipeType, recipe);
@@ -41,7 +45,7 @@ public class Accessor extends MenuItem {
                     @Override
                     public void onPlayerPlace(@Nonnull BlockPlaceEvent blockPlaceEvent) {
                         Location location = blockPlaceEvent.getBlock().getLocation();
-                        load(location, AccessorForeground.getConnection(location), RADIUS);
+                        load(location, AccessorForeground.getConnection(location), DEFAULT_RANGE);
                     }
                 },
                 new BlockBreakHandler(false, false) {
@@ -58,20 +62,36 @@ public class Accessor extends MenuItem {
 
                     @Override
                     public void tick(Block block, SlimefunItem slimefunItem, SlimefunBlockData blockData) {
-                        AccessorForeground.Behavior.UPDATE_MENU.apply(
-                                AccessorForeground.getConnection(block.getLocation()),
-                                StorageCacheUtils.getMenu(block.getLocation()),
-                                null,
-                                null,
-                                null,
-                                null
-                        );
+                        Location location = block.getLocation();
+                        if (loaded.contains(location)) {
+                            AccessorForeground.Behavior.UPDATE_MENU.apply(
+                                    AccessorForeground.getConnection(location),
+                                    StorageCacheUtils.getMenu(location),
+                                    null,
+                                    null,
+                                    null,
+                                    null
+                            );
+                        } else {
+                            // first load
+                            String rangeStr = StorageCacheUtils.getData(location, Accessor.BS_RANGE_KEY);
+                            int range = rangeStr == null? DEFAULT_RANGE : Integer.parseInt(rangeStr);
+                            load(location, AccessorForeground.getConnection(location), range);
+                            AccessorForeground.Behavior.UPDATE_MENU.apply(
+                                    AccessorForeground.getConnection(location),
+                                    StorageCacheUtils.getMenu(location),
+                                    null,
+                                    null,
+                                    null,
+                                    null
+                            );
+                        }
                     }
                 });
     }
 
     public static void load(Location root, Pager<Location> connection, int radius) {
-        Logger.log("Loading connection for " + root);
+        StorageCacheUtils.setData(root, Accessor.BS_RANGE_KEY, String.valueOf(radius));
         World world = root.getWorld();
         new HashMap<>(Slimefun.getTickerTask().getLocations()).values().forEach(locations -> {
             locations.forEach(location -> {

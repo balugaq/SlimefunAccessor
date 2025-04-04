@@ -3,9 +3,12 @@ package com.balugaq.slimefunaccessor.libraries.utils;
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import com.xzavier0722.mc.plugin.slimefun4.storage.util.StorageCacheUtils;
+import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import org.bukkit.Location;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -209,9 +212,14 @@ public class Pager<T> {
         private final T data;
         @Setter
         private String tag = null;
+        @Setter
+        private SlimefunItem slimefunItem = null;
 
         public Container(@Nonnull T data) {
             this.data = data;
+            if (data instanceof Location location) {
+                this.slimefunItem = StorageCacheUtils.getSfItem(location);
+            }
         }
     }
 }

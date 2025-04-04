@@ -1,6 +1,7 @@
 package com.balugaq.slimefunaccessor.implementation.main;
 
 import com.balugaq.slimefunaccessor.implementation.listeners.BlockListener;
+import com.balugaq.slimefunaccessor.implementation.listeners.InventoryListener;
 import com.balugaq.slimefunaccessor.libraries.managers.ConfigManager;
 import com.balugaq.slimefunaccessor.libraries.managers.ListenerManager;
 import com.balugaq.slimefunaccessor.libraries.utils.Logger;
@@ -28,9 +29,11 @@ public class SlimefunAccessor extends JavaPlugin implements SlimefunAddon {
         Preconditions.checkState(instance == null, "SlimefunAccessor is already enabled!");
         instance = this;
         configManager = new ConfigManager(this);
+        configManager.load();
         Logger.setDebug(configManager.getBoolean("debug"));
         listenerManager = new ListenerManager(this);
         listenerManager.addListener(new BlockListener());
+        listenerManager.addListener(new InventoryListener());
         listenerManager.load();
 
         AccessorItemGroups.setup();
@@ -40,6 +43,8 @@ public class SlimefunAccessor extends JavaPlugin implements SlimefunAddon {
     @Override
     public void onDisable() {
         Preconditions.checkState(instance == this, "SlimefunAccessor is not enabled!");
+        configManager.unload();
+        listenerManager.unload();
         instance = null;
     }
 

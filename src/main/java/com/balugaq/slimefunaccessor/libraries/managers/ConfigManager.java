@@ -23,7 +23,7 @@ public class ConfigManager extends Manager {
 
     @Override
     public void unload() {
-
+        save();
     }
 
     @Nullable
