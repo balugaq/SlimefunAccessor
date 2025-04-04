@@ -20,8 +20,14 @@ public class Foreground {
         return connections.getOrDefault(identifier, newPager());
     }
 
+    public static Pager<Location> newPager() {
+        Pager<Location> pager = new Pager<>();
+        pager.setContentPerPage(6 * 8);
+        return pager;
+    }
+
     public void connect(@Nonnull Location identifier, @Nonnull Location location) {
-        connections.compute(identifier, (k, v) -> v == null? newPager() : v).add(location);
+        connections.compute(identifier, (k, v) -> v == null ? newPager() : v).add(location);
     }
 
     public void disconnect(@Nonnull Location identifier, @Nonnull Location location) {
@@ -42,11 +48,5 @@ public class Foreground {
 
     public void destroy(@Nonnull Location identifier) {
         connections.getOrDefault(identifier, newPager()).clear();
-    }
-
-    public static Pager<Location> newPager() {
-        Pager<Location> pager = new Pager<>();
-        pager.setContentPerPage(6 * 8);
-        return pager;
     }
 }

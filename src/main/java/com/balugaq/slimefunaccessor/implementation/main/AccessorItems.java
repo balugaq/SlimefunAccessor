@@ -4,10 +4,10 @@ import com.balugaq.slimefunaccessor.implementation.slimefun.Accessor;
 import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
 
 public class AccessorItems {
+    public static Accessor ACCESSOR;
+
     private AccessorItems() {
     }
-
-    public static Accessor ACCESSOR;
 
     public static void setup() {
         ACCESSOR = (Accessor) new Accessor(

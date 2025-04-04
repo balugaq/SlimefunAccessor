@@ -12,7 +12,6 @@ import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
 import io.github.thebusybiscuit.slimefun4.core.handlers.BlockBreakHandler;
 import io.github.thebusybiscuit.slimefun4.core.handlers.BlockPlaceHandler;
 import io.github.thebusybiscuit.slimefun4.implementation.Slimefun;
-import io.github.thebusybiscuit.slimefun4.implementation.tasks.TickerTask;
 import me.mrCookieSlime.Slimefun.Objects.handlers.BlockTicker;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
@@ -31,6 +30,7 @@ import java.util.List;
 public class Accessor extends MenuItem {
     public static final int RADIUS = 100;
     public static final String BS_FILTER_KEY = "filter";
+
     public Accessor(ItemGroup itemGroup, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe) {
         super(itemGroup, item, recipeType, recipe);
         AccessorForeground.applyBlockMenuPreset(getMenuPreset());
@@ -68,6 +68,17 @@ public class Accessor extends MenuItem {
                 });
     }
 
+    public static void load(Location root, Pager<Location> connection, int radius) {
+        World world = root.getWorld();
+        Slimefun.getTickerTask().getLocations().values().forEach(locations -> {
+            locations.forEach(location -> {
+                if (location.getWorld() == world && location.distance(root) <= radius) {
+                    connection.add(location);
+                }
+            });
+        });
+    }
+
     @Override
     public void init(@Nonnull BlockMenuPreset preset) {
         preset.setSize(54);
@@ -81,16 +92,5 @@ public class Accessor extends MenuItem {
     @Override
     public int[] getSlotsAccessedByItemTransport(ItemTransportFlow itemTransportFlow) {
         return new int[0];
-    }
-
-    public static void load(Location root, Pager<Location> connection, int radius) {
-        World world = root.getWorld();
-        Slimefun.getTickerTask().getLocations().values().forEach(locations -> {
-            locations.forEach(location -> {
-                if (location.getWorld() == world && location.distance(root) <= radius) {
-                    connection.add(location);
-                }
-            });
-        });
     }
 }

@@ -1,6 +1,5 @@
 package com.balugaq.slimefunaccessor.libraries.slimefun;
 
-import com.balugaq.slimefunaccessor.libraries.slimefun.foreground.AccessorForeground;
 import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
 import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
@@ -57,6 +56,7 @@ public abstract class MenuItem extends AccessorItem {
     }
 
     public abstract void init(@Nonnull BlockMenuPreset preset);
+
     public abstract void newInstance(@Nonnull BlockMenu blockMenu, @Nonnull Block block);
 
     public boolean canOpenDefaultImpl(@Nonnull Block block, @Nonnull Player player) {

@@ -1,6 +1,6 @@
 package com.balugaq.slimefunaccessor.libraries.utils;
 
-import com.balugaq.slimefunaccessor.implementation.main.SlimefunAccessor;
+import lombok.Setter;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import javax.annotation.Nonnull;
@@ -9,6 +9,10 @@ import java.util.logging.Level;
 
 public class Logger {
     public static final String DEBUG_PREFIX = "[DEBUG] ";
+    private static final String DEFAULT_PREFIX = "[SlimefunAccessor] ";
+    @Setter
+    public static boolean debug = false;
+    private static JavaPlugin plugin;
 
     private Logger() {
     }
@@ -16,14 +20,14 @@ public class Logger {
     @Nonnull
     public static java.util.logging.Logger getLogger(@Nullable JavaPlugin plugin) {
         if (plugin == null) {
-            return java.util.logging.Logger.getLogger("SlimefunAccessor");
+            return java.util.logging.Logger.getLogger(DEFAULT_PREFIX);
         }
         return plugin.getLogger();
     }
 
     @Nonnull
     public static java.util.logging.Logger getDefaultLogger() {
-        return getLogger(SlimefunAccessor.instance());
+        return getLogger(plugin);
     }
 
     public static void log(Object message) {
@@ -49,6 +53,6 @@ public class Logger {
     }
 
     public static boolean debugging() {
-        return SlimefunAccessor.instance().getConfig().getBoolean("debug");
+        return debug;
     }
 }

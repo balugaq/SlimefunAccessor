@@ -88,6 +88,7 @@ public class AccessorForeground extends Foreground {
             .addItem("N", NEXT_ICON);
 
     public static List<Integer> displaySlots;
+
     static {
         final int[] rawDisplaySlots = MATRIX.getChars("D");
         for (final int rawDisplaySlot : rawDisplaySlots) {
@@ -109,6 +110,24 @@ public class AccessorForeground extends Foreground {
         menu.addMenuClickHandler(MATRIX.getChar("S"), (p, s, i, a) -> Behavior.SEARCH.apply(getConnection(menu.getLocation()), menu, p, s, i, a));
         menu.addMenuClickHandler(MATRIX.getChar("P"), (p, s, i, a) -> Behavior.PREV.apply(getConnection(menu.getLocation()), menu, p, s, i, a));
         menu.addMenuClickHandler(MATRIX.getChar("N"), (p, s, i, a) -> Behavior.NEXT.apply(getConnection(menu.getLocation()), menu, p, s, i, a));
+    }
+
+    public static void addAccessible(Location location) {
+        World world = location.getWorld();
+        for (Location root : getConnections().keySet()) {
+            if (root.getWorld() == world && root.distance(location) < Accessor.RADIUS) {
+                getConnections().get(root).add(location);
+            }
+        }
+    }
+
+    public static void removeAccessible(Location location) {
+        World world = location.getWorld();
+        for (Location root : getConnections().keySet()) {
+            if (root.getWorld() == world && root.distance(location) < Accessor.RADIUS) {
+                getConnections().get(root).remove(location);
+            }
+        }
     }
 
     public static class Behavior {
@@ -240,23 +259,5 @@ public class AccessorForeground extends Foreground {
 
             return false;
         };
-    }
-
-    public static void addAccessible(Location location) {
-        World world = location.getWorld();
-        for (Location root : getConnections().keySet()) {
-            if (root.getWorld() == world && root.distance(location) < Accessor.RADIUS) {
-                getConnections().get(root).add(location);
-            }
-        }
-    }
-
-    public static void removeAccessible(Location location) {
-        World world = location.getWorld();
-        for (Location root : getConnections().keySet()) {
-            if (root.getWorld() == world && root.distance(location) < Accessor.RADIUS) {
-                getConnections().get(root).remove(location);
-            }
-        }
     }
 }

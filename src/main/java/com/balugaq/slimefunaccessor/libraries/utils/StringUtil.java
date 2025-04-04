@@ -16,12 +16,12 @@ public class StringUtil {
     public static Location string2Location(@Nonnull String string) {
         // str: world;x:y:z
         String[] split = string.split(";");
-        if (split.length!= 2) {
+        if (split.length != 2) {
             return null;
         }
 
         String[] xyz = split[1].split(":");
-        if (xyz.length!= 3) {
+        if (xyz.length != 3) {
             return null;
         }
 
