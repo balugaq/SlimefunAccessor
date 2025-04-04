@@ -8,9 +8,7 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
-import org.jetbrains.annotations.Contract;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.net.URL;
 
