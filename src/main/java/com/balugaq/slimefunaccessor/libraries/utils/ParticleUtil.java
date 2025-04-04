@@ -141,7 +141,7 @@ public class ParticleUtil {
     }
 
     public static void drawLineFrom(Location location1, Location location2) {
-        ParticleUtil.drawLineByTotalAmount(Particle.END_ROD, 10, location1, location2);
+        ParticleUtil.drawLineByTotalAmount(Particle.SCULK_CHARGE_POP, (int) location1.distance(location2) * 4, location1, location2);
     }
 
     public static void highlightBlock(Location location) {

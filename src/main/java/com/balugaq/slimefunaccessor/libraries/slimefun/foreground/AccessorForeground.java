@@ -14,6 +14,7 @@ import com.xzavier0722.mc.plugin.slimefun4.storage.util.StorageCacheUtils;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
 import io.github.thebusybiscuit.slimefun4.libraries.dough.items.CustomItemStack;
 import io.github.thebusybiscuit.slimefun4.utils.ChestMenuUtils;
+import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ClickAction;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
 import net.guizhanss.guizhanlib.minecraft.helper.inventory.ItemStackHelper;
@@ -30,6 +31,7 @@ import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Menu should be applied like this:
@@ -51,6 +53,7 @@ import java.util.List;
  * @author baluagq
  */
 public class AccessorForeground extends Foreground {
+    public static final String DEFAULT_COLOR = ChatColor.translateAlternateColorCodes('&', "&6");
     public static final ItemStack AUTO_RELATED_ICON = new CustomItemStack(
             Material.COMPASS,
             "&6自动标记",
@@ -136,6 +139,18 @@ public class AccessorForeground extends Foreground {
         for (int slot : MATRIX.getChars("N")) {
             menu.addMenuClickHandler(slot, (p, s, i, a) -> Behavior.NEXT.apply(getConnection(menu.getLocation()), menu, p, s, i, a));
         }
+
+        menu.addMenuOpeningHandler(player -> {
+            Behavior.AUTO_RELATED.apply(
+                    AccessorForeground.getConnection(menu.getLocation()),
+                    menu,
+                    null,
+                    null,
+                    null,
+                    new ClickAction(false, false)
+            );
+            Accessor.AUTO_RELATED.add(menu.getLocation());
+        });
     }
 
     public static void addAccessible(Location location) {
@@ -168,6 +183,11 @@ public class AccessorForeground extends Foreground {
                 return false;
             }
 
+            if (!pager.isDirty()) {
+                return false;
+            }
+
+            AtomicBoolean dirty = new AtomicBoolean(false);
             final List<Pager.Container<Location>> pages;
             final String filter = StorageCacheUtils.getData(location, Accessor.BS_FILTER_KEY);
             if (filter == null) {
@@ -180,9 +200,14 @@ public class AccessorForeground extends Foreground {
                     if (slimefunItem != null) {
                         itemName = ChatColor.stripColor(slimefunItem.getItemName());
                     } else {
+                        final SlimefunItem item2 = StorageCacheUtils.getSfItem(container.getData());
+                        if (item2 != null) {
+                            container.setSlimefunItem(item2);
+                            dirty.set(true);
+                        }
                         itemName = null;
                     }
-                    return tag.toLowerCase().contains(filter.toLowerCase()) || itemName != null && itemName.toLowerCase().contains(filter.toLowerCase());
+                    return tag != null && tag.toLowerCase().contains(filter.toLowerCase()) || itemName != null && itemName.toLowerCase().contains(filter.toLowerCase());
                 });
             }
 
@@ -195,10 +220,23 @@ public class AccessorForeground extends Foreground {
                     final Location loc = container.getData();
                     final SlimefunItem slimefunItem = container.getSlimefunItem();
                     if (slimefunItem != null) {
-                        menu.replaceExistingItem(slot, ItemStackUtil.rename(SlimefunItemUtil.safeCopy(slimefunItem.getItem(), loc, slimefunItem.getId()), container.getTag()));
+                        menu.replaceExistingItem(slot, ItemStackUtil.resetDisplay(
+                                SlimefunItemUtil.safeCopy(slimefunItem.getItem(), loc, slimefunItem.getId()),
+                                container.getTag(),
+                                slimefunItem.getItemName(),
+                                ChatColor.translateAlternateColorCodes('&', "&7loc: " + loc.getBlockX() + ":" + loc.getBlockY() + ":" + loc.getBlockZ())
+                        ));
+                    } else {
+                        final SlimefunItem item2 = StorageCacheUtils.getSfItem(container.getData());
+                        if (item2 != null) {
+                            container.setSlimefunItem(item2);
+                            dirty.set(true);
+                        }
                     }
                 }
             }
+
+            pager.setDirty(dirty.get());
 
             return false;
         };
@@ -246,8 +284,12 @@ public class AccessorForeground extends Foreground {
                 }
 
                 String tag = ItemStackHelper.getDisplayName(itemStack);
+                if (ChatColor.getLastColors(tag).isEmpty()) {
+                    tag = DEFAULT_COLOR + tag;
+                }
                 container.setTag(tag);
             }
+            pager.setDirty(true);
             return false;
         };
 
@@ -299,6 +341,8 @@ public class AccessorForeground extends Foreground {
             Location location = menu.getLocation();
             if (action.isRightClicked()) {
                 StorageCacheUtils.setData(location, Accessor.BS_RANGE_KEY, String.valueOf(Accessor.DEFAULT_RANGE));
+                pager.clear();
+                Accessor.load(location, pager, Accessor.DEFAULT_RANGE);
                 return false;
             }
 
@@ -311,6 +355,7 @@ public class AccessorForeground extends Foreground {
                         return;
                     }
                     StorageCacheUtils.setData(location, Accessor.BS_RANGE_KEY, String.valueOf(range));
+                    Accessor.load(location, newPager(), range);
                 } catch (NumberFormatException e) {
                     p.sendMessage("输入范围必须是整数！");
                     return;

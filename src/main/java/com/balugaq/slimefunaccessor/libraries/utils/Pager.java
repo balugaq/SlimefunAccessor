@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * A simple implementation of a pager for a list of elements.
@@ -29,7 +28,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 @Getter
 public class Pager<T> {
-    private List<Container<T>> content = new CopyOnWriteArrayList<>();
+    private List<Container<T>> content = new ArrayList<>();
+    @Setter
+    private boolean dirty = true;
     private int contentPerPage = 9;
     private int currentPage = 1;
 
@@ -41,6 +42,7 @@ public class Pager<T> {
 
         int totalPage = getTotalPages();
         this.currentPage = Math.min(currentPage, totalPage);
+        setDirty(true);
         return this;
     }
 
@@ -50,6 +52,7 @@ public class Pager<T> {
         this.content = new ArrayList<>(content);
         int totalPage = getTotalPages();
         this.currentPage = Math.min(currentPage, totalPage);
+        setDirty(true);
         return this;
     }
 
@@ -63,6 +66,7 @@ public class Pager<T> {
         } else {
             this.currentPage = page;
         }
+        setDirty(true);
         return this;
     }
 
@@ -84,14 +88,14 @@ public class Pager<T> {
     @CanIgnoreReturnValue
     @Nonnull
     public Pager<T> add(@Nonnull T element) {
-        content.add(new Container<>(element));
-        return this;
+        return add(new Container<>(element));
     }
 
     @CanIgnoreReturnValue
     @Nonnull
     public Pager<T> add(@Nonnull Container<T> element) {
         content.add(element);
+        setDirty(true);
         return this;
     }
 
@@ -99,6 +103,7 @@ public class Pager<T> {
     @Nonnull
     public Pager<T> addAll(@Nonnull Collection<Container<T>> elements) {
         content.addAll(elements);
+        setDirty(true);
         return this;
     }
 
@@ -112,6 +117,7 @@ public class Pager<T> {
     @Nonnull
     public Pager<T> remove(@Nonnull Container<T> element) {
         content.remove(element);
+        setDirty(true);
         return this;
     }
 
@@ -119,6 +125,7 @@ public class Pager<T> {
     @Nonnull
     public Pager<T> clear() {
         content.clear();
+        setDirty(true);
         return this;
     }
 
@@ -146,6 +153,7 @@ public class Pager<T> {
     @Nonnull
     public List<Container<T>> next() {
         if (hasNext()) currentPage++;
+        setDirty(true);
         return getPage(currentPage);
     }
 
@@ -153,6 +161,7 @@ public class Pager<T> {
     @Nonnull
     public List<Container<T>> previous() {
         if (hasPrevious()) currentPage--;
+        setDirty(true);
         return getPage(currentPage);
     }
 

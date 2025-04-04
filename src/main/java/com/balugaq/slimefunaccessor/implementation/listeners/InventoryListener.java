@@ -9,7 +9,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.inventory.Inventory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,6 +16,11 @@ import java.util.UUID;
 
 public class InventoryListener implements Listener {
     private static final Map<UUID, Location> remoteAccessingPlayers = new HashMap<>();
+
+    public static void addRemoteAccessingPlayer(Player player, Location location) {
+        remoteAccessingPlayers.put(player.getUniqueId(), location);
+    }
+
     @EventHandler
     public void onInventoryClose(InventoryCloseEvent event) {
         Player player = (Player) event.getPlayer();
@@ -31,9 +35,5 @@ public class InventoryListener implements Listener {
                 }, 1L);
             }
         }
-    }
-
-    public static void addRemoteAccessingPlayer(Player player, Location location) {
-        remoteAccessingPlayers.put(player.getUniqueId(), location);
     }
 }

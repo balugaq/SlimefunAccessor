@@ -8,7 +8,10 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.jetbrains.annotations.Contract;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.net.URL;
 
 public class ItemStackUtil {
@@ -60,13 +63,25 @@ public class ItemStackUtil {
         return null;
     }
 
-    public static ItemStack rename(ItemStack original, String name) {
+    public static ItemStack resetDisplay(@Nullable ItemStack original, @Nullable String name) {
+        return resetDisplay(original, name, (String[]) null);
+    }
+
+    public static ItemStack resetDisplay(@Nullable ItemStack original, @Nullable String name, @Nullable String... lore) {
+        if (original == null) {
+            return null;
+        }
+
         if (name == null) {
             return original;
         }
 
         ItemStack itemStack = original.clone();
         ItemMeta meta = itemStack.getItemMeta();
+        if (meta == null) {
+            return itemStack;
+        }
+
         meta.setDisplayName(name);
         itemStack.setItemMeta(meta);
         return itemStack;

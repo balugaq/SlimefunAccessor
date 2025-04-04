@@ -9,7 +9,7 @@ import java.util.logging.Level;
 
 public class Logger {
     public static final String DEBUG_PREFIX = "[DEBUG] ";
-    private static final String DEFAULT_PREFIX = "[SlimefunAccessor] ";
+    private static final String DEFAULT_PREFIX = "SlimefunAccessor";
     @Setter
     public static boolean debug = false;
     private static JavaPlugin plugin;

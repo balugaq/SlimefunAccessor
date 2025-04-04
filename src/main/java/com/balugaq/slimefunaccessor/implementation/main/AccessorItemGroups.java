@@ -7,6 +7,7 @@ import io.github.thebusybiscuit.slimefun4.api.items.groups.SubItemGroup;
 public class AccessorItemGroups {
     public static NestedItemGroup MAIN;
     public static SubItemGroup MACHINES;
+
     private AccessorItemGroups() {
 
     }
