@@ -1,10 +1,13 @@
 package com.balugaq.slimefunaccessor.libraries.slimefun.foreground;
 
 import com.balugaq.slimefunaccessor.implementation.listeners.InventoryListener;
+import com.balugaq.slimefunaccessor.implementation.main.SlimefunAccessorPlugin;
 import com.balugaq.slimefunaccessor.implementation.slimefun.Accessor;
 import com.balugaq.slimefunaccessor.libraries.foreground.Foreground;
+import com.balugaq.slimefunaccessor.libraries.managers.IntegrationManager;
 import com.balugaq.slimefunaccessor.libraries.slimefun.interfaces.BehaviorHandler;
-import com.balugaq.slimefunaccessor.libraries.slimefun.utils.SlimefunItemUtil;
+import com.balugaq.slimefunaccessor.libraries.slimefun.utils.ExtraTagUtils;
+import com.balugaq.slimefunaccessor.libraries.slimefun.utils.SlimefunUtil;
 import com.balugaq.slimefunaccessor.libraries.utils.ChatUtils;
 import com.balugaq.slimefunaccessor.libraries.utils.ItemStackUtil;
 import com.balugaq.slimefunaccessor.libraries.utils.Pager;
@@ -18,6 +21,7 @@ import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ClickAction;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
 import net.guizhanss.guizhanlib.minecraft.helper.inventory.ItemStackHelper;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -31,12 +35,15 @@ import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Menu should be applied like this:
  * <p>
  * X = Auto related to the nearest {@link ItemFrame}
+ * R = Range button, click to set the range of remote machines.
+ * H = Help button, hover to see the help message.
  * D = Displayed Machines.
  * B = {@link ChestMenuUtils#getBackground()}.
  * S = Searcher button, click to input keywords to search.
@@ -44,8 +51,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * N = Next page button.
  * <p>
  * DDDDDDDDX
- * DDDDDDDDB
- * DDDDDDDDB
+ * DDDDDDDDR
+ * DDDDDDDDH
  * DDDDDDDDS
  * DDDDDDDDP
  * DDDDDDDDN
@@ -66,11 +73,22 @@ public class AccessorForeground extends Foreground {
             "&6搜索",
             "&7点击输入搜索关键词."
     );
+
+    public static final ItemStack HELP_ICON = new CustomItemStack(
+            Material.BOOK,
+            "&6帮助",
+            "&7左键机器: 打开机器菜单",
+            "&7右键机器: 高亮方块",
+            "&7Shift + 左键机器: 给机器添加额外标签",
+            "&7Shift + 右键机器: 移除所有额外标签"
+    );
+
     public static final ItemStack PREV_ICON = new CustomItemStack(
             Material.ARROW,
             "&6上一页",
             "&7点击翻到上一页."
     );
+
     public static final ItemStack NEXT_ICON = new CustomItemStack(
             Material.SPECTRAL_ARROW,
             "&6下一页",
@@ -86,12 +104,13 @@ public class AccessorForeground extends Foreground {
     public static final MenuMatrix MATRIX = new MenuMatrix()
             .addLine("DDDDDDDDX")
             .addLine("DDDDDDDDR")
-            .addLine("DDDDDDDDB")
+            .addLine("DDDDDDDDH")
             .addLine("DDDDDDDDS")
             .addLine("DDDDDDDDP")
             .addLine("DDDDDDDDN")
             .addItem("X", AUTO_RELATED_ICON)
             .addItem("R", RANGE_ICON)
+            .addItem("H", HELP_ICON)
             .addItem("D", ChestMenuUtils.getBackground())
             .addItem("B", ChestMenuUtils.getBackground())
             .addItem("S", SEARCH_ICON)
@@ -177,7 +196,7 @@ public class AccessorForeground extends Foreground {
 
     public static class Behavior {
         // Done
-        public static final BehaviorHandler UPDATE_MENU = (pager, menu, u1, u2, u3, u4) -> {
+        public static final BehaviorHandler UPDATE_MENU = (pager, menu, player, u2, u3, u4) -> {
             final Location location = menu.getLocation();
             if (!menu.hasViewer()) {
                 return false;
@@ -207,7 +226,16 @@ public class AccessorForeground extends Foreground {
                         }
                         itemName = null;
                     }
-                    return tag != null && tag.toLowerCase().contains(filter.toLowerCase()) || itemName != null && itemName.toLowerCase().contains(filter.toLowerCase());
+                    boolean preMatch = tag != null && tag.toLowerCase().contains(filter.toLowerCase()) || itemName != null && itemName.toLowerCase().contains(filter.toLowerCase());
+                    if (preMatch) {
+                        return true;
+                    }
+
+                    if (slimefunItem != null && IntegrationManager.isJEGLoaded()) {
+                        return IntegrationManager.isSearchApplicable(player, slimefunItem, filter);
+                    }
+
+                    return false;
                 });
             }
 
@@ -220,12 +248,7 @@ public class AccessorForeground extends Foreground {
                     final Location loc = container.getData();
                     final SlimefunItem slimefunItem = container.getSlimefunItem();
                     if (slimefunItem != null) {
-                        menu.replaceExistingItem(slot, ItemStackUtil.resetDisplay(
-                                SlimefunItemUtil.safeCopy(slimefunItem.getItem(), loc, slimefunItem.getId()),
-                                container.getTag(),
-                                slimefunItem.getItemName(),
-                                ChatColor.translateAlternateColorCodes('&', "&7loc: " + loc.getBlockX() + ":" + loc.getBlockY() + ":" + loc.getBlockZ())
-                        ));
+                        menu.replaceExistingItem(slot, getDisplayItem(container, slimefunItem, loc));
                     } else {
                         final SlimefunItem item2 = StorageCacheUtils.getSfItem(container.getData());
                         if (item2 != null) {
@@ -273,21 +296,27 @@ public class AccessorForeground extends Foreground {
 
                 Location location = container.getData();
                 Collection<Entity> nearbyItemFrames = location.getWorld().getNearbyEntities(BoundingBox.of(location.getBlock()).expand(0.05), entity -> entity instanceof ItemFrame);
-                Entity one = nearbyItemFrames.stream().findFirst().orElse(null);
-                if (!(one instanceof ItemFrame itemFrame)) {
-                    continue;
+                for (Entity one : nearbyItemFrames) {
+                    if (!(one instanceof ItemFrame itemFrame)) {
+                        continue;
+                    }
+
+                    ItemStack itemStack = itemFrame.getItem();
+                    if (itemStack.getType() == Material.AIR) {
+                        continue;
+                    }
+
+                    String tag = ItemStackHelper.getDisplayName(itemStack);
+                    if (ChatColor.getLastColors(tag).isEmpty()) {
+                        tag = DEFAULT_COLOR + tag;
+                    }
+                    container.addTag(tag);
                 }
 
-                ItemStack itemStack = itemFrame.getItem();
-                if (itemStack.getType() == Material.AIR) {
-                    continue;
+                Set<String> extraTags = ExtraTagUtils.getAllExtraTags(location);
+                for (String tag : extraTags) {
+                    container.addTag(tag);
                 }
-
-                String tag = ItemStackHelper.getDisplayName(itemStack);
-                if (ChatColor.getLastColors(tag).isEmpty()) {
-                    tag = DEFAULT_COLOR + tag;
-                }
-                container.setTag(tag);
             }
             pager.setDirty(true);
             return false;
@@ -310,20 +339,19 @@ public class AccessorForeground extends Foreground {
         // Done
         public static final BehaviorHandler ESP_BLOCK = (u1, u2, p, u3, item, u4) -> {
             PdcUtil.findLocationPdc(item).ifPresent(location -> {
-                ParticleUtil.drawLineFrom(p.getLocation(), location.clone().add(0.5, 0.5, 0.5));
-                ParticleUtil.highlightBlock(location);
+                for (int i = 0 ; i < 5; i++) {
+                    long delay = i * 30L;
+                    Bukkit.getScheduler().runTaskLater(SlimefunAccessorPlugin.instance(), () -> {
+                        ParticleUtil.drawLineFrom(p.getLocation(), location.clone().add(0.5, 0.5, 0.5));
+                        ParticleUtil.highlightBlock(location);
+                    }, delay);
+                }
             });
 
             return false;
         };
 
-        // Done
-        public static final BehaviorHandler DISPLAY = (u1, menu, p, u3, item, action) -> {
-            if (action.isRightClicked()) {
-                ESP_BLOCK.apply(u1, menu, p, u3, item, action);
-                return false;
-            }
-
+        public static final BehaviorHandler OPEN_MENU = (u1, menu, p, u3, item, action) -> {
             PdcUtil.findLocationPdc(item).ifPresent(location -> {
                 // open the menu of the machine
                 BlockMenu actualMenu = StorageCacheUtils.getMenu(location);
@@ -334,6 +362,50 @@ public class AccessorForeground extends Foreground {
                 InventoryListener.addRemoteAccessingPlayer(p, menu.getLocation());
             });
 
+            return false;
+        };
+
+        public static final BehaviorHandler ADD_EXTRA_TAG = (u1, u2, p, u3, item, u4) -> {
+            PdcUtil.findLocationPdc(item).ifPresent(location -> {
+                ChatUtils.awaitInput(p, "输入自定义标签：", input -> {
+                    ExtraTagUtils.addExtraTag(location, input);
+                });
+            });
+
+            return false;
+        };
+
+        public static final BehaviorHandler CLEAR_EXTRA_TAG = (u1, u2, p, u3, item, u4) -> {
+            PdcUtil.findLocationPdc(item).ifPresent(ExtraTagUtils::clearExtraTags);
+
+            return false;
+        };
+
+        // Done
+        public static final BehaviorHandler DISPLAY = (u1, menu, p, u3, item, action) -> {
+            // Shift-right-click
+            if (action.isShiftClicked() && action.isRightClicked()) {
+                // Clear custom tag of the machine
+                CLEAR_EXTRA_TAG.apply(u1, menu, p, u3, item, action);
+                return false;
+            }
+
+            // Right-click
+            if (action.isRightClicked()) {
+                // ESP the block
+                ESP_BLOCK.apply(u1, menu, p, u3, item, action);
+                return false;
+            }
+
+            // Shift-left-click
+            if (action.isShiftClicked()) {
+                // Add custom tag to the machine
+                ADD_EXTRA_TAG.apply(u1, menu, p, u3, item, action);
+                return false;
+            }
+
+            // Left-click
+            OPEN_MENU.apply(u1, menu, p, u3, item, action);
             return false;
         };
 
@@ -371,5 +443,14 @@ public class AccessorForeground extends Foreground {
             });
             return false;
         };
+    }
+
+    public static ItemStack getDisplayItem(Pager.Container<Location> container, SlimefunItem slimefunItem, Location loc) {
+        return ItemStackUtil.resetDisplay(
+                SlimefunUtil.safeCopy(slimefunItem.getItem(), loc, slimefunItem.getId()),
+                container.getTag(),
+                slimefunItem.getItemName(),
+                ChatColor.translateAlternateColorCodes('&', "&7loc: " + loc.getBlockX() + ":" + loc.getBlockY() + ":" + loc.getBlockZ())
+        );
     }
 }

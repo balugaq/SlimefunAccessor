@@ -1,6 +1,6 @@
 package com.balugaq.slimefunaccessor.libraries.utils;
 
-import com.balugaq.slimefunaccessor.implementation.main.SlimefunAccessor;
+import com.balugaq.slimefunaccessor.implementation.main.SlimefunAccessorPlugin;
 import org.bukkit.NamespacedKey;
 import org.bukkit.plugin.Plugin;
 
@@ -10,7 +10,7 @@ public class KeyUtils {
     }
 
     public static NamespacedKey newKey(String key) {
-        return newKey(SlimefunAccessor.instance(), key);
+        return newKey(SlimefunAccessorPlugin.instance(), key);
     }
 
     public static NamespacedKey newKey(Plugin namespace, String key) {

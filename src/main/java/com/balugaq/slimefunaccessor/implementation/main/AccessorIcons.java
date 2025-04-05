@@ -9,17 +9,17 @@ public class AccessorIcons {
     public static final SlimefunItemStack ACCESSOR = new SlimefunItemStack(
             "ACCESSOR_ACCESSOR",
             Material.OBSERVER,
-            "&bSlimefun Accessor",
-            "&7This item is used to access Slimefun machines."
+            "&b远程访问器",
+            "&7用于远程访问粘液机器"
     );
 
     public static final ItemStack MAIN = new CustomItemStack(
             Material.OBSERVER,
-            "&bSlimefun Accessor"
+            "&b远程访问器"
     );
 
     public static final ItemStack MACHINES = new CustomItemStack(
             Material.CARTOGRAPHY_TABLE,
-            "&6Machines"
+            "&6机器"
     );
 }

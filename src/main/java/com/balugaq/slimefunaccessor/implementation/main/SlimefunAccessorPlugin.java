@@ -3,7 +3,9 @@ package com.balugaq.slimefunaccessor.implementation.main;
 import com.balugaq.slimefunaccessor.implementation.listeners.BlockListener;
 import com.balugaq.slimefunaccessor.implementation.listeners.InventoryListener;
 import com.balugaq.slimefunaccessor.libraries.managers.ConfigManager;
+import com.balugaq.slimefunaccessor.libraries.managers.IntegrationManager;
 import com.balugaq.slimefunaccessor.libraries.managers.ListenerManager;
+import com.balugaq.slimefunaccessor.libraries.slimefun.utils.SlimefunUtil;
 import com.balugaq.slimefunaccessor.libraries.utils.Logger;
 import com.google.common.base.Preconditions;
 import io.github.thebusybiscuit.slimefun4.api.SlimefunAddon;
@@ -14,13 +16,14 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 @Getter
-public class SlimefunAccessor extends JavaPlugin implements SlimefunAddon {
-    private static SlimefunAccessor instance;
+public class SlimefunAccessorPlugin extends JavaPlugin implements SlimefunAddon {
+    private static SlimefunAccessorPlugin instance;
     private ConfigManager configManager;
     private ListenerManager listenerManager;
+    private IntegrationManager integrationManager;
 
     @Nonnull
-    public static SlimefunAccessor instance() {
+    public static SlimefunAccessorPlugin instance() {
         return instance;
     }
 
@@ -36,6 +39,9 @@ public class SlimefunAccessor extends JavaPlugin implements SlimefunAddon {
         listenerManager.addListener(new InventoryListener());
         listenerManager.load();
 
+        integrationManager = new IntegrationManager(this);
+        integrationManager.load();
+
         AccessorItemGroups.setup();
         AccessorItems.setup();
     }
@@ -43,8 +49,12 @@ public class SlimefunAccessor extends JavaPlugin implements SlimefunAddon {
     @Override
     public void onDisable() {
         Preconditions.checkState(instance == this, "SlimefunAccessor is not enabled!");
-        configManager.unload();
+
+        SlimefunUtil.unregisterAll();
+
+        integrationManager.unload();
         listenerManager.unload();
+        configManager.unload();
         instance = null;
     }
 

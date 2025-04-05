@@ -1,6 +1,6 @@
 package com.balugaq.slimefunaccessor.libraries.slimefun;
 
-import com.balugaq.slimefunaccessor.implementation.main.SlimefunAccessor;
+import com.balugaq.slimefunaccessor.implementation.main.SlimefunAccessorPlugin;
 import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
 import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
@@ -22,7 +22,7 @@ public class AccessorItem extends CustomSlimefunItem {
     }
 
     public AccessorItem registerItem() {
-        super.register(SlimefunAccessor.instance());
+        super.register(SlimefunAccessorPlugin.instance());
         return this;
     }
 }

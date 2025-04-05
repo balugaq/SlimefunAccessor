@@ -15,7 +15,9 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * A simple implementation of a pager for a list of elements.
@@ -220,7 +222,7 @@ public class Pager<T> {
     public static class Container<T> {
         private final T data;
         @Setter
-        private String tag = null;
+        private Set<String> tags = new HashSet<>();
         @Setter
         private SlimefunItem slimefunItem = null;
 
@@ -229,6 +231,20 @@ public class Pager<T> {
             if (data instanceof Location location) {
                 this.slimefunItem = StorageCacheUtils.getSfItem(location);
             }
+        }
+
+        @Nonnull
+        public String getTag() {
+            return tags.stream().findFirst().orElse("无标签");
+        }
+
+        public void setTag(@Nonnull String tag) {
+            tags.clear();
+            tags.add(tag);
+        }
+
+        public void addTag(@Nonnull String tag) {
+            tags.add(tag);
         }
     }
 }

@@ -1,6 +1,6 @@
 package com.balugaq.slimefunaccessor.implementation.listeners;
 
-import com.balugaq.slimefunaccessor.implementation.main.SlimefunAccessor;
+import com.balugaq.slimefunaccessor.implementation.main.SlimefunAccessorPlugin;
 import com.xzavier0722.mc.plugin.slimefun4.storage.util.StorageCacheUtils;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 import org.bukkit.Bukkit;
@@ -30,7 +30,7 @@ public class InventoryListener implements Listener {
             remoteAccessingPlayers.remove(uuid);
             BlockMenu menu = StorageCacheUtils.getMenu(location);
             if (menu != null) {
-                Bukkit.getScheduler().runTaskLater(SlimefunAccessor.instance(), () -> {
+                Bukkit.getScheduler().runTaskLater(SlimefunAccessorPlugin.instance(), () -> {
                     menu.open(player);
                 }, 1L);
             }

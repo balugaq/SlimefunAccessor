@@ -1,6 +1,6 @@
 package com.balugaq.slimefunaccessor.libraries.utils;
 
-import com.balugaq.slimefunaccessor.implementation.main.SlimefunAccessor;
+import com.balugaq.slimefunaccessor.implementation.main.SlimefunAccessorPlugin;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.World;
@@ -149,6 +149,6 @@ public class ParticleUtil {
     }
 
     public static void highlightBlock(Block block) {
-        ParticleUtil.drawCubeByBlock(SlimefunAccessor.instance(), Particle.END_ROD, 1, block);
+        ParticleUtil.drawCubeByBlock(SlimefunAccessorPlugin.instance(), Particle.END_ROD, 1, block);
     }
 }

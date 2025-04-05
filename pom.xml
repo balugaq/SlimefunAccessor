@@ -6,7 +6,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.balugaq.slimefunaccessor</groupId>
     <artifactId>SlimefunAccessor</artifactId>
-    <version>0.1-SNAPSHOT</version>
+    <version>0.2-SNAPSHOT</version>
 
     <pluginRepositories>
         <pluginRepository>
@@ -167,6 +167,14 @@
             <artifactId>GuizhanLibPlugin</artifactId>
             <version>1.7.6</version>
             <scope>provided</scope>
+        </dependency>
+        <!-- Supports -->
+        <dependency>
+            <groupId>com.balugaq.jeg</groupId>
+            <artifactId>JustEnoughGuide</artifactId>
+            <version>77</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/libs/JustEnoughGuide.jar</systemPath>
         </dependency>
     </dependencies>
 </project>

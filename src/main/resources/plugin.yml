@@ -1,7 +1,7 @@
 name: SlimefunAccessor
 author: balugaq
 description: A Slimefun plugin
-main: com.balugaq.slimefunaccessor.implementation.main.SlimefunAccessor
+main: com.balugaq.slimefunaccessor.implementation.main.SlimefunAccessorPlugin
 website: https://github.com/balugaq/SlimefunAccessor
 version: ${project.version}
 api-version: 1.20
@@ -9,3 +9,4 @@ depend:
   - Slimefun
 softdepend:
   - GuizhanLibPlugin
+  - JustEnoughGuide
