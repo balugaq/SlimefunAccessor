@@ -11,18 +11,25 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 
-public class ExtraTagUtils {
-    private static final Random random = new Random();
+/**
+ *
+ * @author balugaq
+ */
+public class ExtraTagUtil {
+    private ExtraTagUtil() {
+    }
+
+    private static final Random RANDOM = new Random();
     public static final String BS_EXTRA_TAG_START = "__sf_accessor_extra_tag_";
     @ParametersAreNonnullByDefault
-    public static void addExtraTag(Location location, String tag) {
+    public static void addExtraTag(final Location location, final String tag) {
         getData(location).ifPresent(data -> {
             data.setData(randomKey(), tag);
         });
     }
 
     @ParametersAreNonnullByDefault
-    public static void removeExtraTag(Location location, String tag) {
+    public static void removeExtraTag(final Location location, final String tag) {
         getData(location).ifPresent(data -> {
             Set<String> pendingRemoval = new HashSet<>();
             data.getAllData().forEach((key, value) -> {
@@ -38,7 +45,7 @@ public class ExtraTagUtils {
     }
 
     @ParametersAreNonnullByDefault
-    public static void clearExtraTags(Location location) {
+    public static void clearExtraTags(final Location location) {
         getData(location).ifPresent(data -> {
             Set<String> pendingRemoval = new HashSet<>();
             data.getAllData().forEach((key, value) -> {
@@ -55,14 +62,14 @@ public class ExtraTagUtils {
 
     @Nonnull
     @ParametersAreNonnullByDefault
-    public static Optional<SlimefunBlockData> getData(Location location) {
+    public static Optional<SlimefunBlockData> getData(final Location location) {
         SlimefunBlockData data = StorageCacheUtils.getBlock(location);
         return Optional.ofNullable(data);
     }
 
     @Nonnull
     @ParametersAreNonnullByDefault
-    public static Set<String> getAllExtraTags(Location location) {
+    public static Set<String> getAllExtraTags(final Location location) {
         Set<String> tags = new HashSet<>();
         getData(location).ifPresent(data -> {
             data.getAllData().forEach((key, value) -> {
@@ -77,6 +84,6 @@ public class ExtraTagUtils {
 
     @Nonnull
     public static String randomKey() {
-        return BS_EXTRA_TAG_START + random.nextInt(Integer.MAX_VALUE);
+        return BS_EXTRA_TAG_START + RANDOM.nextInt(Integer.MAX_VALUE);
     }
 }

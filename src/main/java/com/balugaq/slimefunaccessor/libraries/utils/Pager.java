@@ -9,6 +9,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Location;
+import org.bukkit.inventory.ItemStack;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -38,7 +39,7 @@ public class Pager<T> {
 
     @CanIgnoreReturnValue
     @Nonnull
-    public Pager<T> setContentPerPage(int contentPerPage) {
+    public Pager<T> setContentPerPage(final int contentPerPage) {
         Preconditions.checkArgument(contentPerPage > 0, "contentPerPage must be greater than 0");
         this.contentPerPage = contentPerPage;
 
@@ -50,7 +51,7 @@ public class Pager<T> {
 
     @CanIgnoreReturnValue
     @Nonnull
-    private Pager<T> setContent(@Nonnull List<Container<T>> content) {
+    private Pager<T> setContent(@Nonnull final List<Container<T>> content) {
         this.content = new ArrayList<>(content);
         int totalPage = getTotalPages();
         this.currentPage = Math.min(currentPage, totalPage);
@@ -60,8 +61,8 @@ public class Pager<T> {
 
     @CanIgnoreReturnValue
     @Nonnull
-    private Pager<T> setCurrentPage(int page) {
-        int totalPage = getTotalPages();
+    private Pager<T> setCurrentPage(final int page) {
+        final int totalPage = getTotalPages();
         if (isOutbounds(page)) {
             Logger.warn("Invalid page number: " + page + " (total page: " + totalPage + ")");
             this.currentPage = Math.max(1, Math.min(page, getTotalPages()));
@@ -89,13 +90,13 @@ public class Pager<T> {
 
     @CanIgnoreReturnValue
     @Nonnull
-    public Pager<T> add(@Nonnull T element) {
+    public Pager<T> add(@Nonnull final T element) {
         return add(new Container<>(element));
     }
 
     @CanIgnoreReturnValue
     @Nonnull
-    public Pager<T> add(@Nonnull Container<T> element) {
+    public Pager<T> add(@Nonnull final Container<T> element) {
         content.add(element);
         setDirty(true);
         return this;
@@ -103,7 +104,7 @@ public class Pager<T> {
 
     @CanIgnoreReturnValue
     @Nonnull
-    public Pager<T> addAll(@Nonnull Collection<Container<T>> elements) {
+    public Pager<T> addAll(@Nonnull final Collection<Container<T>> elements) {
         content.addAll(elements);
         setDirty(true);
         return this;
@@ -111,13 +112,13 @@ public class Pager<T> {
 
     @CanIgnoreReturnValue
     @Nonnull
-    public Pager<T> remove(@Nonnull T element) {
+    public Pager<T> remove(@Nonnull final T element) {
         return remove(new Container<>(element));
     }
 
     @CanIgnoreReturnValue
     @Nonnull
-    public Pager<T> remove(@Nonnull Container<T> element) {
+    public Pager<T> remove(@Nonnull final Container<T> element) {
         content.remove(element);
         setDirty(true);
         return this;
@@ -135,11 +136,11 @@ public class Pager<T> {
         return content.isEmpty();
     }
 
-    public boolean contains(@Nonnull T element) {
+    public boolean contains(@Nonnull final T element) {
         return contains(new Container<>(element));
     }
 
-    public boolean contains(@Nonnull Container<T> element) {
+    public boolean contains(@Nonnull final Container<T> element) {
         return content.contains(element);
     }
 
@@ -147,7 +148,7 @@ public class Pager<T> {
         return content.size();
     }
 
-    public int getPageFromIndex(int index) {
+    public int getPageFromIndex(final int index) {
         return (index / contentPerPage) + 1;
     }
 
@@ -173,27 +174,27 @@ public class Pager<T> {
     }
 
     @Nonnull
-    public List<Container<T>> getPageForward(int forwardPages) {
+    public List<Container<T>> getPageForward(final int forwardPages) {
         return getPage(currentPage + forwardPages);
     }
 
     @Nonnull
-    public List<Container<T>> getPageBackward(int backwardPages) {
+    public List<Container<T>> getPageBackward(final int backwardPages) {
         return getPage(currentPage - backwardPages);
     }
 
     @Nonnull
-    public List<Container<T>> getPageLimited(int elementsLimit) {
+    public List<Container<T>> getPageLimited(final int elementsLimit) {
         return getPageLimited(currentPage, elementsLimit);
     }
 
     @Nonnull
-    public List<Container<T>> getPageLimited(int pageStart, int elementsLimit) {
+    public List<Container<T>> getPageLimited(final int pageStart, final int elementsLimit) {
         return getPageLimited(pageStart, elementsLimit, null);
     }
 
     @Nonnull
-    public List<Container<T>> getPageLimited(int pageStart, int elementsLimit, @Nullable Function<Container<T>, Boolean> filter) {
+    public List<Container<T>> getPageLimited(final int pageStart, final int elementsLimit, @Nullable final Function<Container<T>, Boolean> filter) {
         List<Container<T>> filtered = new ArrayList<>();
         for (int i = (pageStart - 1) * contentPerPage; i < content.size() && filtered.size() < elementsLimit; i++) {
             Container<T> container = content.get(i);
@@ -204,7 +205,7 @@ public class Pager<T> {
         return filtered;
     }
 
-    public List<Container<T>> getPage(int page) {
+    public List<Container<T>> getPage(final int page) {
         if (isOutbounds(page)) {
             return Collections.emptyList();
         }
@@ -213,20 +214,22 @@ public class Pager<T> {
         return new ArrayList<>(content.subList(start, end));
     }
 
-    public boolean isOutbounds(int page) {
+    public boolean isOutbounds(final int page) {
         return page < 1 || page > getTotalPages();
     }
 
     @EqualsAndHashCode
     @Getter
     public static class Container<T> {
+        public static final String NOTHING = "无标签";
         private final T data;
-        @Setter
-        private Set<String> tags = new HashSet<>();
+        private final Set<String> tags = new HashSet<>();
         @Setter
         private SlimefunItem slimefunItem = null;
+        @Setter
+        private ItemStack itemOnFrame = null;
 
-        public Container(@Nonnull T data) {
+        public Container(@Nonnull final T data) {
             this.data = data;
             if (data instanceof Location location) {
                 this.slimefunItem = StorageCacheUtils.getSfItem(location);
@@ -235,16 +238,20 @@ public class Pager<T> {
 
         @Nonnull
         public String getTag() {
-            return tags.stream().findFirst().orElse("无标签");
+            return tags.stream().findFirst().orElse(NOTHING);
         }
 
-        public void setTag(@Nonnull String tag) {
+        public void setTag(@Nonnull final String tag) {
             tags.clear();
             tags.add(tag);
         }
 
-        public void addTag(@Nonnull String tag) {
+        public void addTag(@Nonnull final String tag) {
             tags.add(tag);
+        }
+
+        public void clearTags() {
+            tags.clear();
         }
     }
 }

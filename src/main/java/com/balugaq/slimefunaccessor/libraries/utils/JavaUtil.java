@@ -11,24 +11,27 @@ import java.util.stream.Collectors;
 
 /**
  * @author Final_ROOT
+ * @author balugaq
  */
 public class JavaUtil {
+    private JavaUtil() {
+    }
 
     @SafeVarargs
-    public static <T> Set<T> toSet(T... objects) {
+    public static <T> Set<T> toSet(final T... objects) {
         Set<T> result = new HashSet<>(objects.length);
         result.addAll(Arrays.asList(objects));
         return result;
     }
 
     @SafeVarargs
-    public static <T> List<T> toList(T... objects) {
+    public static <T> List<T> toList(final T... objects) {
         List<T> result = new ArrayList<>(objects.length);
         result.addAll(Arrays.asList(objects));
         return result;
     }
 
-    public static int[] toArray(List<Integer> list) {
+    public static int[] toArray(final List<Integer> list) {
         int[] result = new int[list.size()];
         for (int i = 0; i < list.size(); i++) {
             result[i] = list.get(i);
@@ -36,7 +39,7 @@ public class JavaUtil {
         return result;
     }
 
-    public static int[] reserve(int[] objects) {
+    public static int[] reserve(final int[] objects) {
         int[] result = objects.clone();
         for (int i = 0; i < objects.length; i++) {
             result[i] = objects[objects.length - 1 - i];
@@ -44,7 +47,7 @@ public class JavaUtil {
         return result;
     }
 
-    public static <T> List<T> reserve(List<T> objectList) {
+    public static <T> List<T> reserve(final List<T> objectList) {
         List<T> result = new ArrayList<>(objectList);
         for (int i = 0; i < objectList.size(); i++) {
             result.set(i, objectList.get(objectList.size() - 1 - i));
@@ -52,7 +55,7 @@ public class JavaUtil {
         return result;
     }
 
-    public static int[] shuffle(int[] objects) {
+    public static int[] shuffle(final int[] objects) {
         List<Integer> collect = Arrays.stream(objects).boxed().collect(Collectors.toList());
         Collections.shuffle(collect);
         int[] result = objects.clone();
@@ -62,7 +65,7 @@ public class JavaUtil {
         return result;
     }
 
-    public static <T> T[] shuffle(T[] objects) {
+    public static <T> T[] shuffle(final T[] objects) {
         List<T> collect = Arrays.stream(objects).collect(Collectors.toList());
         Collections.shuffle(collect);
         T[] result = objects.clone();
@@ -72,13 +75,13 @@ public class JavaUtil {
         return result;
     }
 
-    public static <T> List<T> shuffle(List<T> objectList) {
+    public static <T> List<T> shuffle(final List<T> objectList) {
         List<T> list = new ArrayList<>(objectList);
         Collections.shuffle(list);
         return list;
     }
 
-    public static double[] disperse(int size, Number... value) {
+    public static double[] disperse(int size, final Number... value) {
         if (size == 1 && value.length > 0) {
             return new double[]{value[0].doubleValue()};
         } else if (size == 0 || value.length == 0) {
@@ -94,7 +97,7 @@ public class JavaUtil {
         return result;
     }
 
-    public static String[] split(String string) {
+    public static String[] split(final String string) {
         String[] result = new String[string.length()];
         for (int i = 0; i < string.length(); i++) {
             result[i] = String.valueOf(string.charAt(i));
@@ -109,7 +112,7 @@ public class JavaUtil {
      * @param length
      * @return
      */
-    public static int[] generateRandomInts(int length) {
+    public static int[] generateRandomInts(final int length) {
         int[] result = new int[length];
         for (int i = 0; i < result.length; i++) {
             result[i] = i;
@@ -117,7 +120,7 @@ public class JavaUtil {
         return JavaUtil.shuffle(result);
     }
 
-    public static int[] generateInts(int length) {
+    public static int[] generateInts(final int length) {
         int[] result = new int[length];
         for (int i = 0; i < result.length; i++) {
             result[i] = i;
@@ -140,7 +143,7 @@ public class JavaUtil {
      * @param <T>
      * @return
      */
-    public static <T> List<T> shuffleByInts(List<T> list, int[] ints) {
+    public static <T> List<T> shuffleByInts(final List<T> list, final int[] ints) {
         List<T> result = new ArrayList<>(list.size());
         for (int anInt : ints) {
             result.add(list.get(anInt));
@@ -148,14 +151,14 @@ public class JavaUtil {
         return result;
     }
 
-    public static String[] addToFirst(String value, String... values) {
+    public static String[] addToFirst(final String value, final String... values) {
         String[] result = new String[values.length + 1];
         result[0] = value;
         System.arraycopy(values, 0, result, 1, values.length);
         return result;
     }
 
-    public static <T> boolean matchOnce(T source, T... targets) {
+    public static <T> boolean matchOnce(final T source, final T... targets) {
         for (T object : targets) {
             if (object.equals(source)) {
                 return true;
@@ -164,7 +167,7 @@ public class JavaUtil {
         return false;
     }
 
-    public static long testTime(@Nonnull Runnable runnable) {
+    public static long testTime(@Nonnull final Runnable runnable) {
         long beginTime = System.nanoTime();
         runnable.run();
         return System.nanoTime() - beginTime;
@@ -173,7 +176,7 @@ public class JavaUtil {
     /**
      * @return In most case, it will not return null. (￣▽￣)"
      */
-    public static <T> T getFirstNotNull(T... objects) {
+    public static <T> T getFirstNotNull(final T... objects) {
         for (T object : objects) {
             if (object != null) {
                 return object;

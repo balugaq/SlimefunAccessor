@@ -13,16 +13,19 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-
+/**
+ *
+ * @author balugaq
+ */
 public class InventoryListener implements Listener {
     private static final Map<UUID, Location> remoteAccessingPlayers = new HashMap<>();
 
-    public static void addRemoteAccessingPlayer(Player player, Location location) {
+    public static void addRemoteAccessingPlayer(final Player player, final Location location) {
         remoteAccessingPlayers.put(player.getUniqueId(), location);
     }
 
     @EventHandler
-    public void onInventoryClose(InventoryCloseEvent event) {
+    public void onInventoryClose(final InventoryCloseEvent event) {
         Player player = (Player) event.getPlayer();
         UUID uuid = player.getUniqueId();
         Location location = remoteAccessingPlayers.get(uuid);

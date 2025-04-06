@@ -8,11 +8,15 @@ import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ *
+ * @author balugaq
+ */
 @Getter
 public class ConfigManager extends Manager {
     private final Map<String, Object> cachedValues = new HashMap<>();
 
-    public ConfigManager(@Nonnull JavaPlugin plugin) {
+    public ConfigManager(@Nonnull final JavaPlugin plugin) {
         super(plugin);
     }
 
@@ -27,57 +31,57 @@ public class ConfigManager extends Manager {
     }
 
     @Nullable
-    public String getString(@Nonnull String path) {
+    public String getString(@Nonnull final String path) {
         if (cachedValues.containsKey(path)) {
             return String.valueOf(cachedValues.get(path));
         }
 
-        String value = getPlugin().getConfig().getString(path);
+        final String value = getPlugin().getConfig().getString(path);
         cachedValues.put(path, value);
         return value;
     }
 
-    public boolean getBoolean(@Nonnull String path) {
+    public boolean getBoolean(@Nonnull final String path) {
         if (cachedValues.containsKey(path)) {
             return Boolean.parseBoolean(String.valueOf(cachedValues.get(path)));
         }
 
-        boolean value = getPlugin().getConfig().getBoolean(path);
+        final boolean value = getPlugin().getConfig().getBoolean(path);
         cachedValues.put(path, value);
         return value;
     }
 
-    public int getInt(@Nonnull String path) {
+    public int getInt(@Nonnull final String path) {
         if (cachedValues.containsKey(path)) {
             return Integer.parseInt(String.valueOf(cachedValues.get(path)));
         }
 
-        int value = getPlugin().getConfig().getInt(path);
+        final int value = getPlugin().getConfig().getInt(path);
         cachedValues.put(path, value);
         return value;
     }
 
-    public double getDouble(@Nonnull String path) {
+    public double getDouble(@Nonnull final String path) {
         if (cachedValues.containsKey(path)) {
             return Double.parseDouble(String.valueOf(cachedValues.get(path)));
         }
 
-        double value = getPlugin().getConfig().getDouble(path);
+        final double value = getPlugin().getConfig().getDouble(path);
         cachedValues.put(path, value);
         return value;
     }
 
-    public long getLong(@Nonnull String path) {
+    public long getLong(@Nonnull final String path) {
         if (cachedValues.containsKey(path)) {
             return Long.parseLong(String.valueOf(cachedValues.get(path)));
         }
 
-        long value = getPlugin().getConfig().getLong(path);
+        final long value = getPlugin().getConfig().getLong(path);
         cachedValues.put(path, value);
         return value;
     }
 
-    public void set(@Nonnull String path, @Nullable Object value) {
+    public void set(@Nonnull final String path, @Nullable final Object value) {
         getPlugin().getConfig().set(path, value);
         cachedValues.put(path, value);
         save();

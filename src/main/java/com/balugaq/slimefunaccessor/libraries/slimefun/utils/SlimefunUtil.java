@@ -19,13 +19,17 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+/**
+ *
+ * @author balugaq
+ */
 public class SlimefunUtil {
     private SlimefunUtil() {
     }
 
     @ParametersAreNonnullByDefault
-    public static ItemStack safeCopy(ItemStack itemStack, Location location, String id) {
-        ItemStack copy = ItemStackUtil.safeCopy(itemStack);
+    public static ItemStack safeCopy(final ItemStack itemStack, final Location location, final String id) {
+        final ItemStack copy = ItemStackUtil.safeCopy(itemStack);
         PdcUtil.setLocationPdc(copy, location);
         PdcUtil.setMirrorSlimefunIdPdc(copy, id);
         return copy;
@@ -36,7 +40,7 @@ public class SlimefunUtil {
         unregisterItemGroups();
     }
 
-    public static void unregisterItem(@Nonnull SlimefunItem item) {
+    public static void unregisterItem(@Nonnull final SlimefunItem item) {
         if (item instanceof Radioactive) {
             Slimefun.getRegistry().getRadioactiveItems().remove(item);
         }
@@ -55,7 +59,7 @@ public class SlimefunUtil {
     }
 
     public static void unregisterAllItems() {
-        List<SlimefunItem> items = new ArrayList<>(Slimefun.getRegistry().getAllSlimefunItems());
+        final List<SlimefunItem> items = new ArrayList<>(Slimefun.getRegistry().getAllSlimefunItems());
         for (SlimefunItem item : items) {
             if (item.getAddon() instanceof SlimefunAccessorPlugin) {
                 unregisterItem(item);
@@ -64,18 +68,18 @@ public class SlimefunUtil {
     }
 
     public static void unregisterItemGroups() {
-        Set<ItemGroup> itemGroups = new HashSet<>();
-        for (ItemGroup itemGroup : Slimefun.getRegistry().getAllItemGroups()) {
+        final Set<ItemGroup> itemGroups = new HashSet<>();
+        for (final ItemGroup itemGroup : Slimefun.getRegistry().getAllItemGroups()) {
             if (itemGroup.getAddon() instanceof SlimefunAccessorPlugin) {
                 itemGroups.add(itemGroup);
             }
         }
-        for (ItemGroup itemGroup : itemGroups) {
+        for (final ItemGroup itemGroup : itemGroups) {
             unregisterItemGroup(itemGroup);
         }
     }
 
-    public static void unregisterItemGroup(@Nullable ItemGroup itemGroup) {
+    public static void unregisterItemGroup(@Nullable final ItemGroup itemGroup) {
         if (itemGroup == null) {
             return;
         }

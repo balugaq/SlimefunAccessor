@@ -9,16 +9,26 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 
+/**
+ *
+ * @author balugaq
+ */
 public class ItemStackUtil {
-    public static ItemStack safeCopy(ItemStack legacy) {
-        Material material = legacy.getType();
-        ItemStack itemStack;
+    private ItemStackUtil() {
+    }
+
+    @Nonnull
+    public static ItemStack safeCopy(@Nonnull final ItemStack legacy) {
+        final Material material = legacy.getType();
+        final ItemStack itemStack;
         if (material == Material.PLAYER_HEAD || material == Material.PLAYER_WALL_HEAD) {
-            String hash = getHash(legacy);
+            final String hash = getHash(legacy);
             if (hash != null) {
                 itemStack = PlayerHead.getItemStack(PlayerSkin.fromHashCode(hash));
             } else {
@@ -29,8 +39,8 @@ public class ItemStackUtil {
         }
         itemStack.setAmount(legacy.getAmount());
 
-        ItemMeta legacyMeta = legacy.getItemMeta();
-        ItemMeta meta = itemStack.getItemMeta();
+        final ItemMeta legacyMeta = legacy.getItemMeta();
+        final ItemMeta meta = itemStack.getItemMeta();
 
         meta.addItemFlags(
                 ItemFlag.HIDE_ATTRIBUTES,
@@ -38,7 +48,7 @@ public class ItemStackUtil {
                 VersionedItemFlag.HIDE_ADDITIONAL_TOOLTIP);
 
         if (legacyMeta.hasDisplayName()) {
-            String name = legacyMeta.getDisplayName();
+            final String name = legacyMeta.getDisplayName();
             meta.setDisplayName(" " + name + " ");
         }
 
@@ -46,14 +56,15 @@ public class ItemStackUtil {
         return itemStack;
     }
 
-    public static String getHash(ItemStack item) {
+    @Nullable
+    public static String getHash(@Nullable final ItemStack item) {
         if (item != null && (item.getType() == Material.PLAYER_HEAD || item.getType() == Material.PLAYER_WALL_HEAD)) {
-            ItemMeta meta = item.getItemMeta();
+            final ItemMeta meta = item.getItemMeta();
             if (meta instanceof SkullMeta) {
                 try {
-                    URL t = ((SkullMeta) meta).getOwnerProfile().getTextures().getSkin();
-                    String path = t.getPath();
-                    String[] parts = path.split("/");
+                    final URL t = ((SkullMeta) meta).getOwnerProfile().getTextures().getSkin();
+                    final String path = t.getPath();
+                    final String[] parts = path.split("/");
                     return parts[parts.length - 1];
                 } catch (Throwable ignored) {
                 }
@@ -62,17 +73,35 @@ public class ItemStackUtil {
         return null;
     }
 
-    public static ItemStack resetDisplay(@Nullable ItemStack original, @Nullable String name) {
+    public static ItemStack resetDisplay(@Nullable final ItemStack original, @Nullable final String name) {
         return resetDisplay(original, name, (String[]) null);
     }
 
-    public static ItemStack resetDisplay(@Nullable ItemStack original, @Nullable String name, @Nullable String... lore) {
+    public static ItemStack resetDisplay(@Nullable final ItemStack original, @Nullable final String name, @Nullable final String lore, @Nullable final String lore2, @Nullable final String... lore3) {
+        // merge lore, lore2, lore3 into lores
+        final List<String> lores = new ArrayList<>();
+        if (lore != null) {
+            lores.add(lore);
+        }
+
+        if (lore2 != null) {
+            lores.add(lore2);
+        }
+
+        if (lore3 != null) {
+            lores.addAll(List.of(lore3));
+        }
+
+        return resetDisplay(original, name, lores.toArray(new String[0]));
+    }
+
+    public static ItemStack resetDisplay(@Nullable final ItemStack original, @Nullable final String name, @Nullable final String... lore) {
         if (original == null) {
             return null;
         }
 
-        ItemStack itemStack = original.clone();
-        ItemMeta meta = itemStack.getItemMeta();
+        final ItemStack itemStack = original.clone();
+        final ItemMeta meta = itemStack.getItemMeta();
         if (meta == null) {
             return itemStack;
         }

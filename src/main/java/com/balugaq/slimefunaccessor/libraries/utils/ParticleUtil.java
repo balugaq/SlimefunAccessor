@@ -13,22 +13,26 @@ import java.util.List;
 
 /**
  * @author Final_ROOT
+ * @author balugaq
  */
 public class ParticleUtil {
+    private ParticleUtil() {
+    }
+
     private static final double[] BLOCK_CUBE_OFFSET_X = new double[]{0, 1, 0, 0, 1, 1, 0, 1};
     private static final double[] BLOCK_CUBE_OFFSET_Y = new double[]{0, 0, 1, 0, 1, 0, 1, 1};
     private static final double[] BLOCK_CUBE_OFFSET_Z = new double[]{0, 0, 0, 1, 0, 1, 1, 1};
 
-    public static void drawLineByTotalAmount(@Nonnull Particle particle, int totalAmount, @Nonnull Location... locations) {
+    public static void drawLineByTotalAmount(@Nonnull final Particle particle, final int totalAmount, @Nonnull final Location... locations) {
         for (int i = 0; i < locations.length; i++) {
             if ((i + 1) < locations.length) {
-                Location location1 = locations[i];
-                Location location2 = locations[i + 1];
+                final Location location1 = locations[i];
+                final Location location2 = locations[i + 1];
 
                 if (totalAmount < 1 || location1.getWorld() == null || location1.getWorld() != location2.getWorld()) {
                     return;
                 }
-                World world = location1.getWorld();
+                final World world = location1.getWorld();
                 double[] x = JavaUtil.disperse(totalAmount, location1.getX(), location2.getX());
                 double[] y = JavaUtil.disperse(totalAmount, location1.getY(), location2.getY());
                 double[] z = JavaUtil.disperse(totalAmount, location1.getZ(), location2.getZ());
@@ -39,33 +43,33 @@ public class ParticleUtil {
         }
     }
 
-    public static void drawLineByTotalAmount(@Nonnull Particle particle, int totalAmount, @Nonnull List<Location> locationList) {
-        Location[] locations = new Location[locationList.size()];
+    public static void drawLineByTotalAmount(@Nonnull final Particle particle, final int totalAmount, @Nonnull final List<Location> locationList) {
+        final Location[] locations = new Location[locationList.size()];
         for (int i = 0; i < locations.length; i++) {
             locations[i] = locationList.get(i);
         }
         ParticleUtil.drawLineByTotalAmount(particle, totalAmount, locations);
     }
 
-    public static void drawLineByDistance(@Nonnull Plugin plugin, @Nonnull Particle particle, long interval, double distance, @Nonnull Location... locations) {
+    public static void drawLineByDistance(@Nonnull final Plugin plugin, @Nonnull final Particle particle, final long interval, final double distance, @Nonnull final Location... locations) {
         int time = 0;
         for (int i = 0; i + 1 < locations.length; i++) {
-            Location location1 = locations[i];
-            Location location2 = locations[i + 1];
+            final Location location1 = locations[i];
+            final Location location2 = locations[i + 1];
 
             if (distance == 0 || location1.getWorld() == null || location1.getWorld() != location2.getWorld()) {
                 return;
             }
-            World world = location1.getWorld();
+            final World world = location1.getWorld();
             double x = location1.getX();
             double y = location1.getY();
             double z = location1.getZ();
 
-            double d = location1.distance(location2);
-            int particleCount = (int) (d / distance);
-            double px = (location2.getX() - x) / (particleCount);
-            double py = (location2.getY() - y) / (particleCount);
-            double pz = (location2.getZ() - z) / (particleCount);
+            final double d = location1.distance(location2);
+            final int particleCount = (int) (d / distance);
+            final double px = (location2.getX() - x) / (particleCount);
+            final double py = (location2.getY() - y) / (particleCount);
+            final double pz = (location2.getZ() - z) / (particleCount);
 
             double t = time;
             int tick = (int) (t / 50);
@@ -75,9 +79,9 @@ public class ParticleUtil {
                 x += px;
                 y += py;
                 z += pz;
-                double fx = x;
-                double fy = y;
-                double fz = z;
+                final double fx = x;
+                final double fy = y;
+                final double fz = z;
                 runnableList.add(() -> world.spawnParticle(particle, fx, fy, fz, 1, 0, 0, 0, 0));
 
                 t += (double) interval / particleCount;
@@ -98,25 +102,25 @@ public class ParticleUtil {
         }
     }
 
-    public static void drawLineByDistance(@Nonnull Plugin plugin, @Nonnull Particle particle, long interval, double distance, @Nonnull List<Location> locationList) {
-        Location[] locations = new Location[locationList.size()];
+    public static void drawLineByDistance(@Nonnull final Plugin plugin, @Nonnull final Particle particle, final long interval, final double distance, @Nonnull final List<Location> locationList) {
+        final Location[] locations = new Location[locationList.size()];
         for (int i = 0; i < locations.length; i++) {
             locations[i] = locationList.get(i);
         }
         ParticleUtil.drawLineByDistance(plugin, particle, interval, distance, locations);
     }
 
-    public static void drawCubeByBlock(@Nonnull Plugin plugin, @Nonnull Particle particle, long interval, Block... blocks) {
+    public static void drawCubeByBlock(@Nonnull final Plugin plugin, @Nonnull final Particle particle, final long interval, @Nonnull final Block... blocks) {
         int time = 0;
-        for (Block block : blocks) {
-            Location location = block.getLocation();
-            World world = location.getWorld();
+        for (final Block block : blocks) {
+            final Location location = block.getLocation();
+            final World world = location.getWorld();
             if (world == null) {
                 continue;
             }
-            int x = location.getBlockX();
-            int y = location.getBlockY();
-            int z = location.getBlockZ();
+            final int x = location.getBlockX();
+            final int y = location.getBlockY();
+            final int z = location.getBlockZ();
             if (time < 50) {
                 for (int i = 0; i < BLOCK_CUBE_OFFSET_X.length; i++) {
                     world.spawnParticle(particle, x + BLOCK_CUBE_OFFSET_X[i], y + BLOCK_CUBE_OFFSET_Y[i], z + BLOCK_CUBE_OFFSET_Z[i], 1, 0, 0, 0, 0);
@@ -132,7 +136,7 @@ public class ParticleUtil {
         }
     }
 
-    public static void drawCubeByBlock(@Nonnull Plugin plugin, @Nonnull Particle particle, long interval, List<Block> blockList) {
+    public static void drawCubeByBlock(@Nonnull final Plugin plugin, @Nonnull final Particle particle, final long interval, final List<Block> blockList) {
         Block[] blocks = new Block[blockList.size()];
         for (int i = 0; i < blockList.size(); i++) {
             blocks[i] = blockList.get(i);
@@ -140,15 +144,15 @@ public class ParticleUtil {
         ParticleUtil.drawCubeByBlock(plugin, particle, interval, blocks);
     }
 
-    public static void drawLineFrom(Location location1, Location location2) {
-        ParticleUtil.drawLineByTotalAmount(Particle.SCULK_CHARGE_POP, (int) location1.distance(location2) * 4, location1, location2);
+    public static void drawLineFrom(final Location location1, final Location location2) {
+        ParticleUtil.drawLineByTotalAmount(Particle.WAX_OFF, (int) location1.distance(location2) * 4, location1, location2);
     }
 
-    public static void highlightBlock(Location location) {
+    public static void highlightBlock(final Location location) {
         highlightBlock(location.getBlock());
     }
 
-    public static void highlightBlock(Block block) {
-        ParticleUtil.drawCubeByBlock(SlimefunAccessorPlugin.instance(), Particle.END_ROD, 1, block);
+    public static void highlightBlock(final Block block) {
+        ParticleUtil.drawCubeByBlock(SlimefunAccessorPlugin.instance(), Particle.WAX_ON, 1, block);
     }
 }

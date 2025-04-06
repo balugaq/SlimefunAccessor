@@ -6,7 +6,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.balugaq.slimefunaccessor</groupId>
     <artifactId>SlimefunAccessor</artifactId>
-    <version>0.2-SNAPSHOT</version>
+    <version>0.3-SNAPSHOT</version>
 
     <pluginRepositories>
         <pluginRepository>

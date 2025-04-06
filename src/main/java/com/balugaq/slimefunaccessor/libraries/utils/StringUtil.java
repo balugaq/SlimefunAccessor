@@ -6,14 +6,21 @@ import org.bukkit.Location;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+/**
+ *
+ * @author balugaq
+ */
 public class StringUtil {
+    private StringUtil() {
+    }
+
     @Nonnull
-    public static String location2String(@Nonnull Location location) {
+    public static String location2String(@Nonnull final Location location) {
         return location.getWorld().getName() + ";" + location.getBlockX() + ":" + location.getBlockY() + ":" + location.getBlockZ();
     }
 
     @Nullable
-    public static Location string2Location(@Nonnull String string) {
+    public static Location string2Location(@Nonnull final String string) {
         // str: world;x:y:z
         String[] split = string.split(";");
         if (split.length != 2) {

@@ -15,6 +15,10 @@ import org.bukkit.plugin.java.JavaPlugin;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+/**
+ *
+ * @author balugaq
+ */
 @Getter
 public class SlimefunAccessorPlugin extends JavaPlugin implements SlimefunAddon {
     private static SlimefunAccessorPlugin instance;

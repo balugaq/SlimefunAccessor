@@ -30,6 +30,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+/**
+ *
+ * @author balugaq
+ */
 public class Accessor extends MenuItem {
     public static final Set<Location> AUTO_RELATED = new HashSet<>();
     public static final int DEFAULT_RANGE = 100;
@@ -37,22 +41,22 @@ public class Accessor extends MenuItem {
     public static final String BS_RANGE_KEY = "range";
     private static final Set<Location> LOADED = new HashSet<>();
 
-    public Accessor(ItemGroup itemGroup, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe) {
+    public Accessor(final ItemGroup itemGroup, final SlimefunItemStack item, final RecipeType recipeType, final ItemStack[] recipe) {
         super(itemGroup, item, recipeType, recipe);
         AccessorForeground.applyBlockMenuPreset(getMenuPreset());
         addItemHandler(
                 new BlockPlaceHandler(false) {
                     @Override
-                    public void onPlayerPlace(@Nonnull BlockPlaceEvent blockPlaceEvent) {
-                        Location location = blockPlaceEvent.getBlock().getLocation();
+                    public void onPlayerPlace(@Nonnull final BlockPlaceEvent blockPlaceEvent) {
+                        final Location location = blockPlaceEvent.getBlock().getLocation();
                         load(location, AccessorForeground.getConnection(location), DEFAULT_RANGE);
                     }
                 },
                 new BlockBreakHandler(false, false) {
                     @Override
                     @ParametersAreNonnullByDefault
-                    public void onPlayerBreak(BlockBreakEvent blockBreakEvent, ItemStack itemStack, List<ItemStack> list) {
-                        Location location = blockBreakEvent.getBlock().getLocation();
+                    public void onPlayerBreak(final BlockBreakEvent blockBreakEvent, final ItemStack itemStack, final List<ItemStack> list) {
+                        final Location location = blockBreakEvent.getBlock().getLocation();
                         unload(location);
                     }
                 },
@@ -63,8 +67,8 @@ public class Accessor extends MenuItem {
                     }
 
                     @Override
-                    public void tick(Block block, SlimefunItem slimefunItem, SlimefunBlockData blockData) {
-                        Location location = block.getLocation();
+                    public void tick(final Block block, final SlimefunItem slimefunItem, final SlimefunBlockData blockData) {
+                        final Location location = block.getLocation();
                         if (LOADED.contains(location)) {
                             AccessorForeground.Behavior.UPDATE_MENU.apply(
                                     AccessorForeground.getConnection(location),
@@ -76,8 +80,8 @@ public class Accessor extends MenuItem {
                             );
                         } else {
                             // first load
-                            String rangeStr = StorageCacheUtils.getData(location, Accessor.BS_RANGE_KEY);
-                            int range = rangeStr == null ? DEFAULT_RANGE : Integer.parseInt(rangeStr);
+                            final String rangeStr = StorageCacheUtils.getData(location, Accessor.BS_RANGE_KEY);
+                            final int range = rangeStr == null ? DEFAULT_RANGE : Integer.parseInt(rangeStr);
                             load(location, AccessorForeground.getConnection(location), range);
                             AccessorForeground.Behavior.UPDATE_MENU.apply(
                                     AccessorForeground.getConnection(location),
@@ -92,10 +96,10 @@ public class Accessor extends MenuItem {
                 });
     }
 
-    public static void load(Location root, Pager<Location> connection, int radius) {
+    public static void load(final Location root, final Pager<Location> connection, final int radius) {
         LOADED.add(root);
         StorageCacheUtils.setData(root, Accessor.BS_RANGE_KEY, String.valueOf(radius));
-        World world = root.getWorld();
+        final World world = root.getWorld();
         new HashMap<>(Slimefun.getTickerTask().getLocations()).values().forEach(locations -> {
             locations.forEach(location -> {
                 if (location.getWorld() == world && location.distance(root) <= radius) {
@@ -108,7 +112,7 @@ public class Accessor extends MenuItem {
         connection.setDirty(true);
     }
 
-    public static void unload(Location root) {
+    public static void unload(final Location root) {
         LOADED.remove(root);
         AUTO_RELATED.remove(root);
         AccessorForeground.getConnection(root).clear();
@@ -116,17 +120,17 @@ public class Accessor extends MenuItem {
     }
 
     @Override
-    public void init(@Nonnull BlockMenuPreset preset) {
+    public void init(@Nonnull final BlockMenuPreset preset) {
         preset.setSize(54);
     }
 
     @Override
-    public void newInstance(@Nonnull BlockMenu blockMenu, @Nonnull Block block) {
+    public void newInstance(@Nonnull final BlockMenu blockMenu, @Nonnull final Block block) {
         AccessorForeground.applyBlockMenu(blockMenu);
     }
 
     @Override
-    public int[] getSlotsAccessedByItemTransport(ItemTransportFlow itemTransportFlow) {
+    public int[] getSlotsAccessedByItemTransport(final ItemTransportFlow itemTransportFlow) {
         return new int[0];
     }
 }

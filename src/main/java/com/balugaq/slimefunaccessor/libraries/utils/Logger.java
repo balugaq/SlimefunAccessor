@@ -7,18 +7,22 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.logging.Level;
 
+/**
+ *
+ * @author balugaq
+ */
 public class Logger {
+    private Logger() {
+    }
+
     public static final String DEBUG_PREFIX = "[DEBUG] ";
     private static final String DEFAULT_PREFIX = "SlimefunAccessor";
     @Setter
     public static boolean debug = false;
     private static JavaPlugin plugin;
 
-    private Logger() {
-    }
-
     @Nonnull
-    public static java.util.logging.Logger getLogger(@Nullable JavaPlugin plugin) {
+    public static java.util.logging.Logger getLogger(@Nullable final JavaPlugin plugin) {
         if (plugin == null) {
             return java.util.logging.Logger.getLogger(DEFAULT_PREFIX);
         }
@@ -30,25 +34,25 @@ public class Logger {
         return getLogger(plugin);
     }
 
-    public static void log(Object message) {
+    public static void log(final Object message) {
         getDefaultLogger().info(String.valueOf(message));
     }
 
-    public static void warn(Object message) {
+    public static void warn(final Object message) {
         getDefaultLogger().warning(String.valueOf(message));
     }
 
-    public static void severe(Object message) {
+    public static void severe(final Object message) {
         getDefaultLogger().severe(String.valueOf(message));
     }
 
-    public static void debug(Object message) {
+    public static void debug(final Object message) {
         if (debugging()) {
             getDefaultLogger().info(DEBUG_PREFIX + message);
         }
     }
 
-    public static void trace(Throwable e) {
+    public static void trace(final Throwable e) {
         getDefaultLogger().log(Level.SEVERE, "Exception occurred", e);
     }
 

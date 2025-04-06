@@ -8,6 +8,10 @@ import javax.annotation.Nonnull;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ *
+ * @author balugaq
+ */
 @Getter
 public class Foreground {
     @Getter
@@ -16,7 +20,8 @@ public class Foreground {
     public Foreground() {
     }
 
-    public static Pager<Location> getConnection(@Nonnull Location identifier) {
+    @Nonnull
+    public static Pager<Location> getConnection(@Nonnull final Location identifier) {
         Pager<Location> existing = connections.get(identifier);
         if (existing == null) {
             existing = newPager();
@@ -32,31 +37,32 @@ public class Foreground {
         return pager;
     }
 
-    public void connect(@Nonnull Location identifier, @Nonnull Location location) {
+    public void connect(@Nonnull final Location identifier, @Nonnull final Location location) {
         getOrCreateConnection(identifier).add(location);
     }
 
-    public void disconnect(@Nonnull Location identifier, @Nonnull Location location) {
+    public void disconnect(@Nonnull final Location identifier, @Nonnull final Location location) {
         getOrCreateConnection(identifier).remove(location);
     }
 
-    public boolean isConnected(@Nonnull Location identifier, @Nonnull Location location) {
+    public boolean isConnected(@Nonnull final Location identifier, @Nonnull final Location location) {
         return getOrCreateConnection(identifier).contains(location);
     }
 
-    public boolean isEmpty(@Nonnull Location identifier) {
+    public boolean isEmpty(@Nonnull final Location identifier) {
         return getOrCreateConnection(identifier).isEmpty();
     }
 
-    public int totalConnected(@Nonnull Location identifier) {
+    public int totalConnected(@Nonnull final Location identifier) {
         return getOrCreateConnection(identifier).size();
     }
 
-    public void destroy(@Nonnull Location identifier) {
+    public void destroy(@Nonnull final Location identifier) {
         getOrCreateConnection(identifier).clear();
     }
 
-    public Pager<Location> getOrCreateConnection(@Nonnull Location identifier) {
+    @Nonnull
+    public Pager<Location> getOrCreateConnection(@Nonnull final Location identifier) {
         return connections.computeIfAbsent(identifier, k -> newPager());
     }
 }

@@ -9,20 +9,24 @@ import org.bukkit.inventory.ItemStack;
 
 import javax.annotation.Nullable;
 
+/**
+ *
+ * @author balugaq
+ */
 public class CustomSlimefunItem extends SlimefunItem {
-    public CustomSlimefunItem(ItemGroup itemGroup, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe) {
+    public CustomSlimefunItem(final ItemGroup itemGroup, final SlimefunItemStack item, final RecipeType recipeType, final ItemStack[] recipe) {
         super(itemGroup, item, recipeType, recipe);
     }
 
-    public CustomSlimefunItem(ItemGroup itemGroup, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe, @Nullable ItemStack recipeOutput) {
+    public CustomSlimefunItem(final ItemGroup itemGroup, final SlimefunItemStack item, final RecipeType recipeType, final ItemStack[] recipe, @Nullable ItemStack recipeOutput) {
         super(itemGroup, item, recipeType, recipe, recipeOutput);
     }
 
-    protected CustomSlimefunItem(ItemGroup itemGroup, ItemStack item, String id, RecipeType recipeType, ItemStack[] recipe) {
+    protected CustomSlimefunItem(final ItemGroup itemGroup, final ItemStack item, String id, final RecipeType recipeType, final ItemStack[] recipe) {
         super(itemGroup, item, id, recipeType, recipe);
     }
 
-    public CustomSlimefunItem registerItem(SlimefunAddon plugin) {
+    public CustomSlimefunItem registerItem(final SlimefunAddon plugin) {
         super.register(plugin);
         return this;
     }

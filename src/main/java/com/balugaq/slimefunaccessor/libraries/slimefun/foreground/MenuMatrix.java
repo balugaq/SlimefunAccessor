@@ -11,6 +11,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ *
+ * @author balugaq
+ */
 @SuppressWarnings("deprecation")
 @Getter
 public class MenuMatrix {
@@ -22,39 +26,39 @@ public class MenuMatrix {
 
     }
 
-    public @Nonnull MenuMatrix addLine(String label) {
+    public @Nonnull MenuMatrix addLine(@Nonnull final String label) {
         labels.add(label);
         return this;
     }
 
-    public @Nonnull MenuMatrix addItem(Character label, ItemStack item, ChestMenu.MenuClickHandler handler) {
+    public @Nonnull MenuMatrix addItem(@Nonnull final Character label, final ItemStack item, final ChestMenu.MenuClickHandler handler) {
         this.itemStackMap.put(label, item);
         this.handlerMap.put(label, handler);
         return this;
     }
 
-    public @Nonnull MenuMatrix addItem(Character label, ItemStack item) {
+    public @Nonnull MenuMatrix addItem(@Nonnull final Character label, final ItemStack item) {
         return addItem(label, item, (p, s, i, a) -> false);
     }
 
-    public @Nonnull MenuMatrix addHandler(Character label, ChestMenu.MenuClickHandler handler) {
+    public @Nonnull MenuMatrix addHandler(@Nonnull final Character label, final ChestMenu.MenuClickHandler handler) {
         this.handlerMap.put(label, handler);
         return this;
     }
 
-    public @Nonnull MenuMatrix addItem(@Nonnull String label, ItemStack item, ChestMenu.MenuClickHandler handler) {
+    public @Nonnull MenuMatrix addItem(@Nonnull final String label, final ItemStack item, final ChestMenu.MenuClickHandler handler) {
         return addItem(label.charAt(0), item, handler);
     }
 
-    public @Nonnull MenuMatrix addItem(@Nonnull String label, ItemStack item) {
+    public @Nonnull MenuMatrix addItem(@Nonnull final String label, final ItemStack item) {
         return addItem(label.charAt(0), item, (p, s, i, a) -> false);
     }
 
-    public @Nonnull MenuMatrix addHandler(@Nonnull String label, ChestMenu.MenuClickHandler handler) {
+    public @Nonnull MenuMatrix addHandler(@Nonnull final String label, final ChestMenu.MenuClickHandler handler) {
         return addHandler(label.charAt(0), handler);
     }
 
-    public void build(@Nonnull BlockMenuPreset preset) {
+    public void build(@Nonnull final BlockMenuPreset preset) {
         int index = 0;
         for (String label : labels) {
             for (int j = 0; j < label.length(); j++) {
@@ -70,7 +74,7 @@ public class MenuMatrix {
         }
     }
 
-    public int getChar(Character label) {
+    public int getChar(@Nonnull final Character label) {
         for (int i = 0; i < labels.size(); i++) {
             String line = labels.get(i);
             for (int j = 0; j < line.length(); j++) {
@@ -83,11 +87,11 @@ public class MenuMatrix {
         return -1;
     }
 
-    public int getChar(@Nonnull String label) {
+    public int getChar(@Nonnull final String label) {
         return getChar(label.charAt(0));
     }
 
-    public int[] getChars(Character label) {
+    public int[] getChars(final Character label) {
         List<Integer> result = new ArrayList<>();
         for (int i = 0; i < labels.size(); i++) {
             String line = labels.get(i);
@@ -106,7 +110,7 @@ public class MenuMatrix {
         return array;
     }
 
-    public int[] getChars(@Nonnull String label) {
+    public int[] getChars(@Nonnull final String label) {
         return getChars(label.charAt(0));
     }
 }

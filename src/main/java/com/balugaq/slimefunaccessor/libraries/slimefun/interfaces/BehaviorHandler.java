@@ -8,5 +8,9 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+/**
+ *
+ * @author balugaq
+ */
 public interface BehaviorHandler extends FFunction<Pager<Location>, BlockMenu, Player, Integer, ItemStack, ClickAction, Boolean> {
 }

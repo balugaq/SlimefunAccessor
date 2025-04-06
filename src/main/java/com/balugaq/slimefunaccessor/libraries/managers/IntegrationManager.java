@@ -18,13 +18,17 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ *
+ * @author balugaq
+ */
 @Getter
 public class IntegrationManager extends Manager {
     @Getter
     private static boolean JEGLoaded;
     @Getter
     private static Boolean pinyin;
-    public IntegrationManager(@Nonnull JavaPlugin plugin) {
+    public IntegrationManager(@Nonnull final JavaPlugin plugin) {
         super(plugin);
     }
 
@@ -38,7 +42,7 @@ public class IntegrationManager extends Manager {
         JEGLoaded = false;
     }
 
-    public static boolean isSearchApplicable(@Nonnull Player player, @Nonnull SlimefunItem slimefunItem, @Nonnull String searchTerm) {
+    public static boolean isSearchApplicable(@Nonnull final Player player, @Nonnull final SlimefunItem slimefunItem, @Nonnull final String searchTerm) {
         if (!JEGLoaded) {
             return false;
         }
@@ -47,17 +51,17 @@ public class IntegrationManager extends Manager {
             pinyin = JustEnoughGuide.getConfigManager().isPinyinSearch();
         }
 
-        Pair<String, Map<FilterType, String>> parsedSearchTerm = parseSearchTerm(searchTerm);
-        String actualSearchTerm = parsedSearchTerm.getFirstValue();
+        final Pair<String, Map<FilterType, String>> parsedSearchTerm = parseSearchTerm(searchTerm);
+        final String actualSearchTerm = parsedSearchTerm.getFirstValue();
         if (actualSearchTerm == null || actualSearchTerm.isBlank()) {
             return true;
         }
 
-        Map<FilterType, String> filters = parsedSearchTerm.getSecondValue();
+        final Map<FilterType, String> filters = parsedSearchTerm.getSecondValue();
         if (filters != null && !filters.isEmpty()) {
             Set<SlimefunItem> item = new HashSet<>();
             item.add(slimefunItem);
-            for (Map.Entry<FilterType, String> filter : filters.entrySet()) {
+            for (final Map.Entry<FilterType, String> filter : filters.entrySet()) {
                 item = SearchGroup.filterItems(player, filter.getKey(), filter.getValue(), pinyin, item);
                 if (item.isEmpty()) {
                     return false;
@@ -69,18 +73,18 @@ public class IntegrationManager extends Manager {
     }
 
     @Nonnull
-    public static Pair<String, Map<FilterType, String>> parseSearchTerm(@Nonnull String searchTerm) {
-        StringBuilder actualSearchTermBuilder = new StringBuilder();
-        String[] split = searchTerm.split(" ");
+    public static Pair<String, Map<FilterType, String>> parseSearchTerm(@Nonnull final String searchTerm) {
+        final StringBuilder actualSearchTermBuilder = new StringBuilder();
+        final String[] split = searchTerm.split(" ");
         Map<FilterType, String> filters = new HashMap<>();
 
         for (String s : split) {
             boolean isFilter = false;
 
-            for (FilterType filterType : FilterType.values()) {
+            for (final FilterType filterType : FilterType.values()) {
                 if (s.startsWith(filterType.getFlag()) && s.length() > filterType.getFlag().length()) {
                     isFilter = true;
-                    String filterValue = s.substring(filterType.getFlag().length());
+                    final String filterValue = s.substring(filterType.getFlag().length());
                     filters.put(filterType, filterValue);
                     break;
                 }
@@ -93,8 +97,8 @@ public class IntegrationManager extends Manager {
 
         String actualSearchTerm = actualSearchTermBuilder.toString().trim();
 
-        for (FilterType filterType : FilterType.values()) {
-            String flag = filterType.getFlag();
+        for (final FilterType filterType : FilterType.values()) {
+            final String flag = filterType.getFlag();
             actualSearchTerm = actualSearchTerm.replaceAll(Pattern.quote(flag), Matcher.quoteReplacement(flag));
         }
 

@@ -4,8 +4,14 @@ import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
 import io.github.thebusybiscuit.slimefun4.libraries.dough.items.CustomItemStack;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
-
+/**
+ *
+ * @author balugaq
+ */
 public class AccessorIcons {
+    private AccessorIcons() {
+    }
+
     public static final SlimefunItemStack ACCESSOR = new SlimefunItemStack(
             "ACCESSOR_ACCESSOR",
             Material.OBSERVER,
