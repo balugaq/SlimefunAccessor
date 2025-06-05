@@ -15,7 +15,9 @@ import com.balugaq.slimefunaccessor.libraries.utils.ParticleUtil;
 import com.balugaq.slimefunaccessor.libraries.utils.PdcUtil;
 import com.xzavier0722.mc.plugin.slimefun4.storage.util.StorageCacheUtils;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
+import io.github.thebusybiscuit.slimefun4.implementation.Slimefun;
 import io.github.thebusybiscuit.slimefun4.libraries.dough.items.CustomItemStack;
+import io.github.thebusybiscuit.slimefun4.libraries.dough.protection.Interaction;
 import io.github.thebusybiscuit.slimefun4.utils.ChestMenuUtils;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ClickAction;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
@@ -98,7 +100,7 @@ public class AccessorForeground extends Foreground {
     public static final ItemStack RANGE_ICON = new CustomItemStack(
             Material.CLOCK,
             "&6范围",
-            "&7点击设置远程范围.（1~200）"
+            "&7点击设置远程范围.（1~32）"
     );
 
     public static final MenuMatrix MATRIX = new MenuMatrix()
@@ -358,6 +360,10 @@ public class AccessorForeground extends Foreground {
 
         public static final BehaviorHandler OPEN_MENU = (u1, menu, p, u3, item, action) -> {
             PdcUtil.findLocationPdc(item).ifPresent(location -> {
+                if (!Slimefun.getProtectionManager().hasPermission(p, location, Interaction.INTERACT_BLOCK)) {
+                    return;
+                }
+
                 // open the menu of the machine
                 final BlockMenu actualMenu = StorageCacheUtils.getMenu(location);
                 if (actualMenu == null) {
@@ -435,11 +441,11 @@ public class AccessorForeground extends Foreground {
             }
 
             p.closeInventory();
-            ChatUtil.awaitInput(p, "输入远程范围：（1~200）", input -> {
+            ChatUtil.awaitInput(p, "输入远程范围：（1~32）", input -> {
                 try {
                     final int range = Integer.parseInt(input);
-                    if (range < 1 || range > 200) {
-                        p.sendMessage("输入范围必须在1~200之间！");
+                    if (range < 1 || range > 32) {
+                        p.sendMessage("输入范围必须在1~32！");
                         return;
                     }
                     StorageCacheUtils.setData(location, Accessor.BS_RANGE_KEY, String.valueOf(range));
